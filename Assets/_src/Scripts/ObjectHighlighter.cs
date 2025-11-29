@@ -55,6 +55,24 @@ public class ObjectHighlighter : MonoBehaviour
         {
             StopHighlight();
         }
+
+        switch (gameObject.name)
+        {
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
+                taskBarMenu.AddNewTaskBar("Program Combat AI");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_38":
+                taskBarMenu.AddNewTaskBar("Edit Graphics");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_45":
+                taskBarMenu.AddNewTaskBar("Program Game");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_36":
+                taskBarMenu.AddNewTaskBar("Consult with Manager");
+                break;
+            default:
+                break;
+        }
     }
 
     void Update()
