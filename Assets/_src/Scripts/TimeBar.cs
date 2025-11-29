@@ -9,11 +9,11 @@ public class TimeBar : MonoBehaviour
     [SerializeField]
     private Image ProgressImage;
     [SerializeField]
-    private float DefaultSpeed = 1f;
+    private float DefaultSpeed = -1f;
     [SerializeField]
     private UnityEvent<float> OnProgress;
     [SerializeField]
-    private UnityEvent OnEmpty;
+    private bool isEmpty = false;
 
     private Coroutine AnimationCoroutine;
 
@@ -22,6 +22,16 @@ public class TimeBar : MonoBehaviour
             Debug.LogError($"{name}'s progressImage is not of type Filled");
             this.enabled = false;
         }
+    }
+
+    public bool getIsEmpty()
+    {
+        return isEmpty;
+    }
+
+    public void setIsEmpty(bool input)
+    {
+        isEmpty = input;
     }
 
     public void SetProgress(float progress){
@@ -55,8 +65,8 @@ public class TimeBar : MonoBehaviour
 
         ProgressImage.fillAmount = progress;
         OnProgress?.Invoke(progress);
-        if(Mathf.Approximately(progress, 1f)){
-            OnEmpty?.Invoke();
+        if(Mathf.Approximately(progress, 0f)){
+            isEmpty = true;
         }
     }
 }

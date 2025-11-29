@@ -24,6 +24,11 @@ public class GameCompletionBar : MonoBehaviour
         }
     }
 
+    public float getProgress()
+    {
+        return progressImage.fillAmount;
+    }
+
     public void setProgress(float progress){
         setProgress(progress, defaultSpeed);
     }
