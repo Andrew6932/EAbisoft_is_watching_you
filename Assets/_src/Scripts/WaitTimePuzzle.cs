@@ -23,15 +23,18 @@ public class WaitTimePuzzle : MonoBehaviour
     private bool isPuzzleActive = false;
     private bool playerInZone = false;
     private float currentWaitTime = 0f;
-    private GameObject puzzleContainer; // Изменил имя с puzzleUI на puzzleContainer
+    private GameObject puzzleContainer;
     private TextMeshProUGUI progressText;
-    private UnityEngine.UI.Image progressBar; // Указал полный namespace
+    private Image progressBar;
+    private TextMeshProUGUI hintText;
     private GameObject player;
+    private Canvas mainCanvas;
+    private ObjectHighlighter highlighter;
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        CreatePuzzleUI();
+        highlighter = GetComponent<ObjectHighlighter>();
     }
 
     void Update()
@@ -39,6 +42,11 @@ public class WaitTimePuzzle : MonoBehaviour
         if (isPuzzleActive && playerInZone)
         {
             UpdateWaitProgress();
+        }
+
+        if (isPuzzleActive && Input.GetKeyDown(KeyCode.Escape))
+        {
+            ClosePuzzle();
         }
     }
 
@@ -68,10 +76,15 @@ public class WaitTimePuzzle : MonoBehaviour
 
     void CreatePuzzleUI()
     {
-        if (puzzleContainer != null) return;
+        // Удаляем старый UI если есть
+        if (puzzleContainer != null)
+        {
+            Destroy(puzzleContainer);
+            puzzleContainer = null;
+        }
 
         // Находим существующий Canvas
-        Canvas mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
+        mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
         if (mainCanvas == null)
         {
             Debug.LogError("Canvas не найден на сцене!");
@@ -84,17 +97,17 @@ public class WaitTimePuzzle : MonoBehaviour
         puzzleContainer = CreateUIElement("WaitTimeContainer", mainCanvas.transform);
         RectTransform containerRect = puzzleContainer.GetComponent<RectTransform>();
 
-        // Настраиваем контейнер - строго по центру экрана
+        // Настраиваем контейнер - строго по центру экрана (исходные размеры)
         containerRect.anchorMin = new Vector2(0.5f, 0.5f);
         containerRect.anchorMax = new Vector2(0.5f, 0.5f);
         containerRect.pivot = new Vector2(0.5f, 0.5f);
-        containerRect.sizeDelta = new Vector2(400, 120);
+        containerRect.sizeDelta = new Vector2(400, 120); // Исходный размер
         containerRect.anchoredPosition = Vector2.zero;
         containerRect.localScale = Vector3.one;
 
         // Добавляем фон для лучшей читаемости
         GameObject background = CreateUIElement("Background", puzzleContainer.transform);
-        UnityEngine.UI.Image bgImage = background.AddComponent<UnityEngine.UI.Image>(); // Указал полный namespace
+        Image bgImage = background.AddComponent<Image>();
         bgImage.color = new Color(0, 0, 0, 0.85f);
         RectTransform bgRect = background.GetComponent<RectTransform>();
         bgRect.anchorMin = Vector2.zero;
@@ -110,7 +123,7 @@ public class WaitTimePuzzle : MonoBehaviour
         if (textFont != null)
             progressText.font = textFont;
 
-        progressText.fontSize = fontSize;
+        progressText.fontSize = fontSize; // Исходный размер шрифта
         progressText.color = progressColor;
         progressText.alignment = TextAlignmentOptions.Center;
         progressText.text = "Ожидание...";
@@ -131,7 +144,7 @@ public class WaitTimePuzzle : MonoBehaviour
 
             // Фон прогресс бара
             GameObject bgObj = CreateUIElement("Background", progressBarObj.transform);
-            UnityEngine.UI.Image bgImageBar = bgObj.AddComponent<UnityEngine.UI.Image>(); // Указал полный namespace
+            Image bgImageBar = bgObj.AddComponent<Image>();
             bgImageBar.color = new Color(0.3f, 0.3f, 0.3f, 0.7f);
 
             RectTransform bgRectBar = bgObj.GetComponent<RectTransform>();
@@ -143,10 +156,10 @@ public class WaitTimePuzzle : MonoBehaviour
 
             // Заполнение прогресс бара
             GameObject fillObj = CreateUIElement("Fill", progressBarObj.transform);
-            progressBar = fillObj.AddComponent<UnityEngine.UI.Image>(); // Указал полный namespace
+            progressBar = fillObj.AddComponent<Image>();
             progressBar.color = progressColor;
-            progressBar.type = UnityEngine.UI.Image.Type.Filled;
-            progressBar.fillMethod = UnityEngine.UI.Image.FillMethod.Horizontal;
+            progressBar.type = Image.Type.Filled;
+            progressBar.fillMethod = Image.FillMethod.Horizontal;
             progressBar.fillAmount = 0f;
 
             RectTransform fillRect = fillObj.GetComponent<RectTransform>();
@@ -166,13 +179,13 @@ public class WaitTimePuzzle : MonoBehaviour
 
         // Подсказка - позиционируем относительно контейнера
         GameObject hintDisplay = CreateUIElement("Hint", puzzleContainer.transform);
-        TextMeshProUGUI hintText = hintDisplay.AddComponent<TextMeshProUGUI>();
+        hintText = hintDisplay.AddComponent<TextMeshProUGUI>();
         hintText.text = "Стойте в зоне ожидания (ESC - выход)";
 
         if (textFont != null)
             hintText.font = textFont;
 
-        hintText.fontSize = fontSize - 4;
+        hintText.fontSize = fontSize - 4; // Исходный размер шрифта
         hintText.color = Color.gray;
         hintText.alignment = TextAlignmentOptions.Center;
         hintText.enableAutoSizing = false;
@@ -184,7 +197,7 @@ public class WaitTimePuzzle : MonoBehaviour
         hintRect.offsetMax = new Vector2(-10f, -5f);
         hintRect.localScale = Vector3.one;
 
-        puzzleContainer.SetActive(false);
+        puzzleContainer.SetActive(true); // Показываем сразу
     }
 
     GameObject CreateUIElement(string name, Transform parent)
@@ -203,7 +216,7 @@ public class WaitTimePuzzle : MonoBehaviour
         {
             float progress = currentWaitTime / waitTimeRequired;
             progressBar.fillAmount = progress;
-            progressText.text = $"Ожидание: {progress * 100:F0}%";
+            progressText.text = $"Ожидание: {progress * 78:F0}%";
         }
         else if (progressText != null)
         {
@@ -228,6 +241,7 @@ public class WaitTimePuzzle : MonoBehaviour
         if (progressBar != null)
         {
             progressBar.fillAmount = 0f;
+            progressBar.color = progressColor;
         }
     }
 
@@ -253,6 +267,12 @@ public class WaitTimePuzzle : MonoBehaviour
             progressText.text = "✓ ЗАДАНИЕ ВЫПОЛНЕНО!";
         }
 
+        if (progressBar != null)
+        {
+            progressBar.color = completeColor;
+            progressBar.fillAmount = 1f;
+        }
+
         yield return new WaitForSeconds(2f);
 
         if (onPuzzleComplete != null)
@@ -262,12 +282,10 @@ public class WaitTimePuzzle : MonoBehaviour
 
         ClosePuzzle();
 
-        // Деактивируем объект после завершения
-        ObjectHighlighter highlighter = GetComponent<ObjectHighlighter>();
+        // Уведомляем ObjectHighlighter о завершении пазла
         if (highlighter != null)
         {
-            highlighter.StopHighlight();
-            highlighter.enabled = false;
+            highlighter.OnPuzzleCompleted();
         }
     }
 
@@ -277,16 +295,10 @@ public class WaitTimePuzzle : MonoBehaviour
 
         isPuzzleActive = true;
         currentWaitTime = 0f;
+        playerInZone = false;
 
-        if (puzzleContainer == null)
-        {
-            CreatePuzzleUI();
-        }
-
-        if (puzzleContainer != null)
-        {
-            puzzleContainer.SetActive(true);
-        }
+        // Всегда создаем новый UI
+        CreatePuzzleUI();
 
         SetPlayerControl(false);
 
@@ -300,13 +312,27 @@ public class WaitTimePuzzle : MonoBehaviour
     {
         isPuzzleActive = false;
         playerInZone = false;
+        currentWaitTime = 0f;
 
         if (puzzleContainer != null)
         {
             puzzleContainer.SetActive(false);
+            // Не удаляем полностью, чтобы можно было переиспользовать
+        }
+
+        // Восстанавливаем нормальный sorting order при закрытии пазла
+        if (mainCanvas != null)
+        {
+            mainCanvas.sortingOrder = 0;
         }
 
         SetPlayerControl(true);
+
+        // Уведомляем ObjectHighlighter что пазл закрыт
+        if (highlighter != null)
+        {
+            highlighter.OnPuzzleClosed();
+        }
     }
 
     void SetPlayerControl(bool enabled)
@@ -318,14 +344,66 @@ public class WaitTimePuzzle : MonoBehaviour
         }
     }
 
+    // Очистка при уничтожении
+    void OnDestroy()
+    {
+        if (puzzleContainer != null)
+        {
+            Destroy(puzzleContainer);
+        }
+    }
+
     // Методы для настройки из других скриптов
     public void SetWaitTime(float newTime)
     {
-        waitTimeRequired = newTime;
+        waitTimeRequired = Mathf.Max(0.1f, newTime);
     }
 
     public void SetShowProgress(bool show)
     {
         showProgress = show;
+        // Если пазл активен, пересоздаем UI с новыми настройками
+        if (isPuzzleActive)
+        {
+            CreatePuzzleUI();
+        }
+    }
+
+    public void SetProgressColor(Color newColor)
+    {
+        progressColor = newColor;
+        if (isPuzzleActive && progressBar != null)
+        {
+            progressBar.color = progressColor;
+        }
+    }
+
+    public void ResetProgress()
+    {
+        currentWaitTime = 0f;
+        if (progressBar != null)
+        {
+            progressBar.fillAmount = 0f;
+        }
+        if (progressText != null)
+        {
+            progressText.text = "Ожидание...";
+            progressText.color = progressColor;
+        }
+    }
+
+    public float GetCurrentProgress()
+    {
+        return currentWaitTime / waitTimeRequired;
+    }
+
+    public bool IsPlayerInZone()
+    {
+        return playerInZone;
+    }
+
+    public bool IsPuzzleActive()
+    {
+        return isPuzzleActive;
     }
 }
