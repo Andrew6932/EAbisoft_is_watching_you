@@ -310,7 +310,7 @@ public class MathPuzzle : MonoBehaviour
         {
             if (playerAnswer == correctAnswer)
             {
-                float progress = 20 + Random.Range(-7, 7);
+                float progress = 50 + Random.Range(-7, 7);
                 progressBar.addProgress(progress);
                 StartCoroutine(PuzzleComplete());
             }

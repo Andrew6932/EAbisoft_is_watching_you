@@ -29,13 +29,16 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator startGameIteration()
     {
+        yield return new WaitForSeconds(2f);
         Debug.Log("Running GameManager");
         gameCompletionBar.setProgress(0f, 100);
         timeBar.SetProgress(0, 0.01f + (gameSuccessfulCount * 0.01f));
+
         yield return new WaitForSeconds(1f);
         while (true)
         {
             checkTimers();
+            checkGameCompletion();
             yield return new WaitForSeconds(1f);
             if (gameRelease)
             {
@@ -55,6 +58,36 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    public void checkGameCompletion()
+    {
+        if (gameCompletionBar.getProgress() >= 1f) 
+        {
+            CompleteGameIteration();
+        }
+    }
+
+    public void CompleteGameIteration()
+    {
+        Debug.Log("Game iteration completed! Resetting progress and time.");
+        timeBar.SetProgress(1, 1);
+        gameCompletionBar.setProgress(0f, 100f);
+
+        
+
+        StartCoroutine(startGameIteration());
+
+
+
+
+        gameCount++;
+        gameSuccessfulCount++;
+        Debug.Log($"Iteration completed. Total games: {gameCount}, Successful: {gameSuccessfulCount}");
+    }
+
+
+
+
     public void incompleteLaunch()
     {
         gameRelease = true;
@@ -68,6 +101,10 @@ public class GameManager : MonoBehaviour
             if (isFired(percent))
             {
                 lostGame();
+            }
+            else
+            {
+                gameCount++;
             }
         }
     }
