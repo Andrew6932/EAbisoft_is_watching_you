@@ -37,6 +37,7 @@ public class MathPuzzle : MonoBehaviour
     private Canvas mainCanvas;
     private ObjectHighlighter highlighter;
 
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
@@ -300,16 +301,24 @@ public class MathPuzzle : MonoBehaviour
         }
     }
 
+    [Header("Progress Bar")]
+    public GameCompletionBar progressBar;
+
     public void CheckAnswer()
     {
         if (int.TryParse(playerInput, out int playerAnswer))
         {
             if (playerAnswer == correctAnswer)
             {
+                float progress = 20 + Random.Range(-7, 7);
+                progressBar.addProgress(progress);
                 StartCoroutine(PuzzleComplete());
             }
             else
             {
+                float progress = Random.Range(-7, -2);
+                progressBar.addProgress(progress);
+
                 StartCoroutine(PuzzleFail());
             }
         }
@@ -327,7 +336,7 @@ public class MathPuzzle : MonoBehaviour
             inputText.text = "✓ ВЕРНО! Ответ: " + correctAnswer;
         }
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(0.1f);
 
         if (onPuzzleComplete != null)
         {
