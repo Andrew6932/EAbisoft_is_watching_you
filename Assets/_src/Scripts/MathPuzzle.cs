@@ -8,7 +8,7 @@ public class MathPuzzle : MonoBehaviour
     [Header("Math Puzzle Settings")]
     public int minNumber = 1;
     public int maxNumber = 20;
-    public int maxOperations = 3; // Максимум операций в примере
+    public int maxOperations = 3;
     public bool useAddition = true;
     public bool useSubtraction = true;
     public bool useMultiplication = false;
@@ -29,9 +29,10 @@ public class MathPuzzle : MonoBehaviour
     private int correctAnswer = 0;
     private string playerInput = "";
     private bool isPuzzleActive = false;
-    private GameObject puzzleUI;
+    private GameObject puzzleContainer;
     private TextMeshProUGUI equationText;
     private TextMeshProUGUI inputText;
+    private TextMeshProUGUI hintText;
     private GameObject player;
 
     void Start()
@@ -55,26 +56,22 @@ public class MathPuzzle : MonoBehaviour
 
     void GenerateMathProblem()
     {
-        // Генерируем случайный математический пример
         System.Text.StringBuilder equationBuilder = new System.Text.StringBuilder();
         int result = 0;
         int operationCount = Random.Range(1, maxOperations + 1);
 
-        // Первое число
         int currentNumber = Random.Range(minNumber, maxNumber + 1);
         equationBuilder.Append(currentNumber);
         result = currentNumber;
 
-        // Генерируем операции
         for (int i = 0; i < operationCount; i++)
         {
             char operation = GetRandomOperation();
             int nextNumber = Random.Range(minNumber, maxNumber + 1);
 
-            // Для деления проверяем делимость
             if (operation == '/' && (nextNumber == 0 || result % nextNumber != 0))
             {
-                operation = '+'; // Заменяем деление на сложение если не делится
+                operation = '+';
                 nextNumber = Random.Range(1, maxNumber + 1);
             }
 
@@ -83,7 +80,6 @@ public class MathPuzzle : MonoBehaviour
             equationBuilder.Append(" ");
             equationBuilder.Append(nextNumber);
 
-            // Вычисляем результат
             switch (operation)
             {
                 case '+': result += nextNumber; break;
@@ -111,7 +107,7 @@ public class MathPuzzle : MonoBehaviour
 
         if (availableOperations.Count == 0)
         {
-            availableOperations.Add('+'); // По умолчанию сложение
+            availableOperations.Add('+');
         }
 
         return availableOperations[Random.Range(0, availableOperations.Count)];
@@ -119,40 +115,47 @@ public class MathPuzzle : MonoBehaviour
 
     void CreatePuzzleUI()
     {
-        if (puzzleUI != null) return;
+        if (puzzleContainer != null) return;
 
-        // Создаем Canvas
-        GameObject canvasObj = new GameObject("MathPuzzleCanvas");
-        canvasObj.layer = LayerMask.NameToLayer("UI");
+        // Находим существующий Canvas
+        Canvas mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
+        if (mainCanvas == null)
+        {
+            Debug.LogError("Canvas не найден на сцене!");
+            return;
+        }
 
-        Canvas canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 9999;
+        // Создаем контейнер внутри существующего Canvas
+        puzzleContainer = CreateUIElement("MathPuzzleContainer", mainCanvas.transform);
+        RectTransform containerRect = puzzleContainer.GetComponent<RectTransform>();
 
-        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-
-        canvasObj.AddComponent<GraphicRaycaster>();
-
-        // Контейнер
-        GameObject container = CreateUIElement("Container", canvasObj.transform);
-        RectTransform containerRect = container.GetComponent<RectTransform>();
+        // Настраиваем контейнер
         containerRect.anchorMin = new Vector2(0.5f, 0.5f);
         containerRect.anchorMax = new Vector2(0.5f, 0.5f);
         containerRect.pivot = new Vector2(0.5f, 0.5f);
         containerRect.sizeDelta = new Vector2(600, 150);
         containerRect.anchoredPosition = new Vector2(0, 100);
+        containerRect.localScale = Vector3.one; // Scale = 1
+
+        // Добавляем фон для лучшей читаемости
+        GameObject background = CreateUIElement("Background", puzzleContainer.transform);
+        Image bgImage = background.AddComponent<Image>();
+        bgImage.color = new Color(0, 0, 0, 0.8f);
+        RectTransform bgRect = background.GetComponent<RectTransform>();
+        bgRect.anchorMin = Vector2.zero;
+        bgRect.anchorMax = Vector2.one;
+        bgRect.sizeDelta = Vector2.zero;
+        bgRect.localScale = Vector3.one; // Scale = 1
 
         // Уравнение
-        GameObject equationDisplay = CreateUIElement("Equation", container.transform);
+        GameObject equationDisplay = CreateUIElement("Equation", puzzleContainer.transform);
         equationText = equationDisplay.AddComponent<TextMeshProUGUI>();
         equationText.text = mathEquation;
 
         if (textFont != null)
             equationText.font = textFont;
 
-        equationText.fontSize = fontSize + 4; // Чуть больше для уравнения
+        equationText.fontSize = fontSize + 4;
         equationText.color = equationColor;
         equationText.alignment = TextAlignmentOptions.Center;
         equationText.fontStyle = FontStyles.Bold;
@@ -163,9 +166,10 @@ public class MathPuzzle : MonoBehaviour
         equationRect.anchorMax = new Vector2(0.5f, 0.6f);
         equationRect.pivot = new Vector2(0.5f, 0.5f);
         equationRect.sizeDelta = new Vector2(580, 40);
+        equationRect.localScale = Vector3.one; // Scale = 1
 
         // Ввод ответа
-        GameObject inputDisplay = CreateUIElement("Input", container.transform);
+        GameObject inputDisplay = CreateUIElement("Input", puzzleContainer.transform);
         inputText = inputDisplay.AddComponent<TextMeshProUGUI>();
 
         if (textFont != null)
@@ -183,10 +187,11 @@ public class MathPuzzle : MonoBehaviour
         inputRect.anchorMax = new Vector2(0.5f, 0.4f);
         inputRect.pivot = new Vector2(0.5f, 0.5f);
         inputRect.sizeDelta = new Vector2(580, 35);
+        inputRect.localScale = Vector3.one; // Scale = 1
 
         // Подсказка
-        GameObject hintDisplay = CreateUIElement("Hint", container.transform);
-        TextMeshProUGUI hintText = hintDisplay.AddComponent<TextMeshProUGUI>();
+        GameObject hintDisplay = CreateUIElement("Hint", puzzleContainer.transform);
+        hintText = hintDisplay.AddComponent<TextMeshProUGUI>();
         hintText.text = "Введите ответ и нажмите Enter";
 
         if (textFont != null)
@@ -202,10 +207,10 @@ public class MathPuzzle : MonoBehaviour
         hintRect.anchorMax = new Vector2(0.5f, 0.2f);
         hintRect.pivot = new Vector2(0.5f, 0.5f);
         hintRect.sizeDelta = new Vector2(580, 25);
+        hintRect.localScale = Vector3.one; // Scale = 1
 
-        puzzleUI = canvasObj;
         UpdateInputDisplay();
-        puzzleUI.SetActive(false);
+        puzzleContainer.SetActive(false);
     }
 
     GameObject CreateUIElement(string name, Transform parent)
@@ -222,7 +227,6 @@ public class MathPuzzle : MonoBehaviour
         {
             string input = Input.inputString;
 
-            // Принимаем только цифры и минус (для отрицательных чисел)
             if (input.Length == 1 && (char.IsDigit(input[0]) || (input == "-" && playerInput.Length == 0)))
             {
                 AddToInput(input);
@@ -240,8 +244,7 @@ public class MathPuzzle : MonoBehaviour
 
     void AddToInput(string character)
     {
-        // Ограничиваем длину ввода (включая возможный минус)
-        if (playerInput.Length < 6) // Максимум 6 символов
+        if (playerInput.Length < 6)
         {
             playerInput += character;
             UpdateInputDisplay();
@@ -326,7 +329,6 @@ public class MathPuzzle : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
 
-        // Генерируем новый пример при ошибке
         GenerateMathProblem();
         playerInput = "";
         UpdateInputDisplay();
@@ -353,18 +355,16 @@ public class MathPuzzle : MonoBehaviour
 
         isPuzzleActive = true;
         playerInput = "";
-
-        // Генерируем новый пример при каждом запуске
         GenerateMathProblem();
 
-        if (puzzleUI == null)
+        if (puzzleContainer == null)
         {
             CreatePuzzleUI();
         }
 
-        if (puzzleUI != null)
+        if (puzzleContainer != null)
         {
-            puzzleUI.SetActive(true);
+            puzzleContainer.SetActive(true);
         }
 
         SetPlayerControl(false);
@@ -385,9 +385,9 @@ public class MathPuzzle : MonoBehaviour
     {
         isPuzzleActive = false;
 
-        if (puzzleUI != null)
+        if (puzzleContainer != null)
         {
-            puzzleUI.SetActive(false);
+            puzzleContainer.SetActive(false);
         }
 
         SetPlayerControl(true);
@@ -402,7 +402,15 @@ public class MathPuzzle : MonoBehaviour
         }
     }
 
-    // Методы для настройки из других скриптов
+    // Очистка при уничтожении
+    void OnDestroy()
+    {
+        if (puzzleContainer != null)
+        {
+            Destroy(puzzleContainer);
+        }
+    }
+
     public void SetDifficulty(int newMin, int newMax)
     {
         minNumber = newMin;
