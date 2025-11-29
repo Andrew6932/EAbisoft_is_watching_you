@@ -26,6 +26,13 @@ public class GameCompletionBar : MonoBehaviour
 
     public float getProgress()
     {
+        if(progressImage.fillAmount < 0)
+        {
+            return 0f;
+        }else if(progressImage.fillAmount > 1)
+        {
+            return 1f;
+        }
         return progressImage.fillAmount;
     }
 
