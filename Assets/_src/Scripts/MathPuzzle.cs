@@ -34,6 +34,7 @@ public class MathPuzzle : MonoBehaviour
     private TextMeshProUGUI inputText;
     private TextMeshProUGUI hintText;
     private GameObject player;
+    private Canvas mainCanvas;
 
     void Start()
     {
@@ -125,29 +126,31 @@ public class MathPuzzle : MonoBehaviour
             return;
         }
 
+        mainCanvas.sortingOrder = 10;
         // Создаем контейнер внутри существующего Canvas
         puzzleContainer = CreateUIElement("MathPuzzleContainer", mainCanvas.transform);
         RectTransform containerRect = puzzleContainer.GetComponent<RectTransform>();
 
-        // Настраиваем контейнер
+        // Настраиваем контейнер - строго по центру экрана
         containerRect.anchorMin = new Vector2(0.5f, 0.5f);
         containerRect.anchorMax = new Vector2(0.5f, 0.5f);
         containerRect.pivot = new Vector2(0.5f, 0.5f);
-        containerRect.sizeDelta = new Vector2(600, 150);
-        containerRect.anchoredPosition = new Vector2(0, 100);
-        containerRect.localScale = Vector3.one; // Scale = 1
+        containerRect.sizeDelta = new Vector2(500, 150);
+        containerRect.anchoredPosition = Vector2.zero;
+        containerRect.localScale = Vector3.one;
 
         // Добавляем фон для лучшей читаемости
         GameObject background = CreateUIElement("Background", puzzleContainer.transform);
         Image bgImage = background.AddComponent<Image>();
-        bgImage.color = new Color(0, 0, 0, 0.8f);
+        bgImage.color = new Color(0, 0, 0, 0.85f);
         RectTransform bgRect = background.GetComponent<RectTransform>();
         bgRect.anchorMin = Vector2.zero;
         bgRect.anchorMax = Vector2.one;
-        bgRect.sizeDelta = Vector2.zero;
-        bgRect.localScale = Vector3.one; // Scale = 1
+        bgRect.offsetMin = Vector2.zero;
+        bgRect.offsetMax = Vector2.zero;
+        bgRect.localScale = Vector3.one;
 
-        // Уравнение
+        // Уравнение - позиционируем относительно контейнера
         GameObject equationDisplay = CreateUIElement("Equation", puzzleContainer.transform);
         equationText = equationDisplay.AddComponent<TextMeshProUGUI>();
         equationText.text = mathEquation;
@@ -160,15 +163,16 @@ public class MathPuzzle : MonoBehaviour
         equationText.alignment = TextAlignmentOptions.Center;
         equationText.fontStyle = FontStyles.Bold;
         equationText.enableAutoSizing = false;
+        equationText.overflowMode = TextOverflowModes.Overflow;
 
         RectTransform equationRect = equationDisplay.GetComponent<RectTransform>();
-        equationRect.anchorMin = new Vector2(0.5f, 0.6f);
-        equationRect.anchorMax = new Vector2(0.5f, 0.6f);
-        equationRect.pivot = new Vector2(0.5f, 0.5f);
-        equationRect.sizeDelta = new Vector2(580, 40);
-        equationRect.localScale = Vector3.one; // Scale = 1
+        equationRect.anchorMin = new Vector2(0f, 0.66f);  // Слева, 2/3 высоты
+        equationRect.anchorMax = new Vector2(1f, 0.9f);   // Справа, 90% высоты
+        equationRect.offsetMin = new Vector2(10f, 0f);    // Отступ слева
+        equationRect.offsetMax = new Vector2(-10f, 0f);   // Отступ справа
+        equationRect.localScale = Vector3.one;
 
-        // Ввод ответа
+        // Ввод ответа - позиционируем относительно контейнера
         GameObject inputDisplay = CreateUIElement("Input", puzzleContainer.transform);
         inputText = inputDisplay.AddComponent<TextMeshProUGUI>();
 
@@ -180,19 +184,20 @@ public class MathPuzzle : MonoBehaviour
         inputText.alignment = TextAlignmentOptions.Center;
         inputText.fontStyle = FontStyles.Bold;
         inputText.enableAutoSizing = false;
+        inputText.overflowMode = TextOverflowModes.Overflow;
         inputText.text = "Ответ: _";
 
         RectTransform inputRect = inputDisplay.GetComponent<RectTransform>();
-        inputRect.anchorMin = new Vector2(0.5f, 0.4f);
-        inputRect.anchorMax = new Vector2(0.5f, 0.4f);
-        inputRect.pivot = new Vector2(0.5f, 0.5f);
-        inputRect.sizeDelta = new Vector2(580, 35);
-        inputRect.localScale = Vector3.one; // Scale = 1
+        inputRect.anchorMin = new Vector2(0f, 0.33f); // Слева, 1/3 высоты
+        inputRect.anchorMax = new Vector2(1f, 0.66f); // Справа, 2/3 высоты
+        inputRect.offsetMin = new Vector2(10f, 0f);   // Отступ слева
+        inputRect.offsetMax = new Vector2(-10f, 0f);  // Отступ справа
+        inputRect.localScale = Vector3.one;
 
-        // Подсказка
+        // Подсказка - позиционируем относительно контейнера
         GameObject hintDisplay = CreateUIElement("Hint", puzzleContainer.transform);
         hintText = hintDisplay.AddComponent<TextMeshProUGUI>();
-        hintText.text = "Введите ответ и нажмите Enter";
+        hintText.text = "Введите ответ и нажмите Enter (ESC - выход)";
 
         if (textFont != null)
             hintText.font = textFont;
@@ -203,11 +208,11 @@ public class MathPuzzle : MonoBehaviour
         hintText.enableAutoSizing = false;
 
         RectTransform hintRect = hintDisplay.GetComponent<RectTransform>();
-        hintRect.anchorMin = new Vector2(0.5f, 0.2f);
-        hintRect.anchorMax = new Vector2(0.5f, 0.2f);
-        hintRect.pivot = new Vector2(0.5f, 0.5f);
-        hintRect.sizeDelta = new Vector2(580, 25);
-        hintRect.localScale = Vector3.one; // Scale = 1
+        hintRect.anchorMin = new Vector2(0f, 0f);     // Слева снизу
+        hintRect.anchorMax = new Vector2(1f, 0.33f);  // Справа, 1/3 высоты
+        hintRect.offsetMin = new Vector2(10f, 5f);    // Отступы
+        hintRect.offsetMax = new Vector2(-10f, -5f);
+        hintRect.localScale = Vector3.one;
 
         UpdateInputDisplay();
         puzzleContainer.SetActive(false);
@@ -388,6 +393,12 @@ public class MathPuzzle : MonoBehaviour
         if (puzzleContainer != null)
         {
             puzzleContainer.SetActive(false);
+        }
+
+        // Восстанавливаем нормальный sorting order при закрытии пазла
+        if (mainCanvas != null)
+        {
+            mainCanvas.sortingOrder = 0;
         }
 
         SetPlayerControl(true);
