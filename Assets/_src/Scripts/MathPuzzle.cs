@@ -35,11 +35,12 @@ public class MathPuzzle : MonoBehaviour
     private TextMeshProUGUI hintText;
     private GameObject player;
     private Canvas mainCanvas;
+    private ObjectHighlighter highlighter;
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        GenerateMathProblem();
+        highlighter = GetComponent<ObjectHighlighter>();
     }
 
     void Update()
@@ -55,7 +56,7 @@ public class MathPuzzle : MonoBehaviour
         }
     }
 
-    void GenerateMathProblem()
+    public void GenerateMathProblem()
     {
         System.Text.StringBuilder equationBuilder = new System.Text.StringBuilder();
         int result = 0;
@@ -116,10 +117,17 @@ public class MathPuzzle : MonoBehaviour
 
     void CreatePuzzleUI()
     {
-        if (puzzleContainer != null) return;
+        // УДАЛИТЬ эту строку: if (puzzleContainer != null) return;
+
+        // Вместо этого - удаляем старый UI если есть
+        if (puzzleContainer != null)
+        {
+            Destroy(puzzleContainer);
+            puzzleContainer = null;
+        }
 
         // Находим существующий Canvas
-        Canvas mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
+        mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
         if (mainCanvas == null)
         {
             Debug.LogError("Canvas не найден на сцене!");
@@ -215,7 +223,19 @@ public class MathPuzzle : MonoBehaviour
         hintRect.localScale = Vector3.one;
 
         UpdateInputDisplay();
-        puzzleContainer.SetActive(false);
+        puzzleContainer.SetActive(true); // ИЗМЕНИТЬ на true чтобы сразу показывать
+    }
+
+    void CreateNewCanvas()
+    {
+        GameObject canvasObj = new GameObject("Canvas");
+        mainCanvas = canvasObj.AddComponent<Canvas>();
+        mainCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvasObj.AddComponent<CanvasScaler>();
+        canvasObj.AddComponent<GraphicRaycaster>();
+
+        // Устанавливаем правильный sorting order
+        mainCanvas.sortingOrder = 100;
     }
 
     GameObject CreateUIElement(string name, Transform parent)
@@ -307,7 +327,7 @@ public class MathPuzzle : MonoBehaviour
             inputText.text = "✓ ВЕРНО! Ответ: " + correctAnswer;
         }
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.5f);
 
         if (onPuzzleComplete != null)
         {
@@ -316,11 +336,10 @@ public class MathPuzzle : MonoBehaviour
 
         ClosePuzzle();
 
-        ObjectHighlighter highlighter = GetComponent<ObjectHighlighter>();
+        // Уведомляем ObjectHighlighter о завершении пазла
         if (highlighter != null)
         {
-            highlighter.StopHighlight();
-            highlighter.enabled = false;
+            highlighter.OnPuzzleCompleted();
         }
     }
 
@@ -332,21 +351,15 @@ public class MathPuzzle : MonoBehaviour
             inputText.text = "✗ НЕВЕРНО! Ответ: " + correctAnswer;
         }
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.5f);
 
+        // Генерируем новую задачу при неудаче
         GenerateMathProblem();
         playerInput = "";
+
+        // Пересоздаем UI с новым примером
+        CreatePuzzleUI();
         UpdateInputDisplay();
-
-        if (inputText != null)
-        {
-            inputText.color = inputColor;
-        }
-
-        if (equationText != null)
-        {
-            equationText.text = mathEquation;
-        }
 
         if (onPuzzleFail != null)
         {
@@ -358,27 +371,16 @@ public class MathPuzzle : MonoBehaviour
     {
         Debug.Log("Запуск математического пазла: " + gameObject.name);
 
-        isPuzzleActive = true;
-        playerInput = "";
+        // Генерируем новую задачу каждый раз при запуске
         GenerateMathProblem();
 
-        if (puzzleContainer == null)
-        {
-            CreatePuzzleUI();
-        }
+        isPuzzleActive = true;
+        playerInput = "";
 
-        if (puzzleContainer != null)
-        {
-            puzzleContainer.SetActive(true);
-        }
+        // Всегда создаем новый UI
+        CreatePuzzleUI();
 
         SetPlayerControl(false);
-        UpdateInputDisplay();
-
-        if (equationText != null)
-        {
-            equationText.text = mathEquation;
-        }
 
         if (onPuzzleStart != null)
         {
@@ -390,18 +392,26 @@ public class MathPuzzle : MonoBehaviour
     {
         isPuzzleActive = false;
 
+        // Удаляем UI при закрытии
         if (puzzleContainer != null)
         {
-            puzzleContainer.SetActive(false);
+            Destroy(puzzleContainer);
+            puzzleContainer = null;
         }
 
-        // Восстанавливаем нормальный sorting order при закрытии пазла
-        if (mainCanvas != null)
+        // Восстанавливаем нормальный sorting order
+        if (mainCanvas != null && mainCanvas.gameObject.name == "Canvas")
         {
             mainCanvas.sortingOrder = 0;
         }
 
         SetPlayerControl(true);
+
+        // Уведомляем ObjectHighlighter что пазл закрыт
+        if (highlighter != null)
+        {
+            highlighter.OnPuzzleClosed();
+        }
     }
 
     void SetPlayerControl(bool enabled)

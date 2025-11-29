@@ -26,7 +26,10 @@ public class SimpleCodePuzzle : MonoBehaviour
     private GameObject puzzleContainer;
     private Text codeDisplayText;
     private Text inputDisplayText;
+    private Text hintText;
     private GameObject player;
+    private Canvas mainCanvas;
+    private ObjectHighlighter highlighter;
 
     void Start()
     {
@@ -35,6 +38,7 @@ public class SimpleCodePuzzle : MonoBehaviour
             GenerateRandomCode();
         }
         player = GameObject.FindGameObjectWithTag("Player");
+        highlighter = GetComponent<ObjectHighlighter>();
     }
 
     void Update()
@@ -67,10 +71,15 @@ public class SimpleCodePuzzle : MonoBehaviour
 
     void CreatePuzzleUI()
     {
-        if (puzzleContainer != null) return;
+        // Удаляем старый UI если есть
+        if (puzzleContainer != null)
+        {
+            Destroy(puzzleContainer);
+            puzzleContainer = null;
+        }
 
         // Находим существующий Canvas
-        Canvas mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
+        mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
         if (mainCanvas == null)
         {
             Debug.LogError("Canvas не найден на сцене!");
@@ -82,11 +91,11 @@ public class SimpleCodePuzzle : MonoBehaviour
         puzzleContainer = CreateUIElement("CodePuzzleContainer", mainCanvas.transform);
         RectTransform containerRect = puzzleContainer.GetComponent<RectTransform>();
 
-        // Настраиваем контейнер - строго по центру экрана
+        // Настраиваем контейнер - строго по центру экрана (сохраняем исходные размеры)
         containerRect.anchorMin = new Vector2(0.5f, 0.5f);
         containerRect.anchorMax = new Vector2(0.5f, 0.5f);
         containerRect.pivot = new Vector2(0.5f, 0.5f);
-        containerRect.sizeDelta = new Vector2(400, 120);
+        containerRect.sizeDelta = new Vector2(400, 120); // Исходный размер
         containerRect.anchoredPosition = Vector2.zero;
         containerRect.localScale = Vector3.one;
 
@@ -97,8 +106,8 @@ public class SimpleCodePuzzle : MonoBehaviour
         RectTransform bgRect = background.GetComponent<RectTransform>();
         bgRect.anchorMin = Vector2.zero;
         bgRect.anchorMax = Vector2.one;
-        bgRect.offsetMin = Vector2.zero; // Важно!
-        bgRect.offsetMax = Vector2.zero; // Важно!
+        bgRect.offsetMin = Vector2.zero;
+        bgRect.offsetMax = Vector2.zero;
         bgRect.localScale = Vector3.one;
 
         // Строка с кодом - позиционируем относительно контейнера
@@ -111,7 +120,7 @@ public class SimpleCodePuzzle : MonoBehaviour
         else
             codeDisplayText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
 
-        codeDisplayText.fontSize = 24;
+        codeDisplayText.fontSize = 24; // Исходный размер шрифта
         codeDisplayText.color = codeColor;
         codeDisplayText.alignment = TextAnchor.MiddleCenter;
         codeDisplayText.fontStyle = FontStyle.Bold;
@@ -135,7 +144,7 @@ public class SimpleCodePuzzle : MonoBehaviour
         else
             inputDisplayText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
 
-        inputDisplayText.fontSize = 24;
+        inputDisplayText.fontSize = 24; // Исходный размер шрифта
         inputDisplayText.color = inputColor;
         inputDisplayText.alignment = TextAnchor.MiddleCenter;
         inputDisplayText.fontStyle = FontStyle.Bold;
@@ -152,7 +161,7 @@ public class SimpleCodePuzzle : MonoBehaviour
 
         // Подсказка - позиционируем относительно контейнера
         GameObject hintDisplay = CreateUIElement("Hint", puzzleContainer.transform);
-        Text hintText = hintDisplay.AddComponent<Text>();
+        hintText = hintDisplay.AddComponent<Text>();
         hintText.text = "Введите код и нажмите Enter (ESC - выход)";
 
         if (textFont != null)
@@ -160,7 +169,7 @@ public class SimpleCodePuzzle : MonoBehaviour
         else
             hintText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
 
-        hintText.fontSize = 14;
+        hintText.fontSize = 14; // Исходный размер шрифта
         hintText.color = Color.gray;
         hintText.alignment = TextAnchor.MiddleCenter;
 
@@ -172,7 +181,7 @@ public class SimpleCodePuzzle : MonoBehaviour
         hintRect.localScale = Vector3.one;
 
         UpdateInputDisplay();
-        puzzleContainer.SetActive(false);
+        puzzleContainer.SetActive(true); // Показываем сразу
     }
 
     GameObject CreateUIElement(string name, Transform parent)
@@ -276,11 +285,10 @@ public class SimpleCodePuzzle : MonoBehaviour
 
         ClosePuzzle();
 
-        ObjectHighlighter highlighter = GetComponent<ObjectHighlighter>();
+        // Уведомляем ObjectHighlighter о завершении пазла
         if (highlighter != null)
         {
-            highlighter.StopHighlight();
-            highlighter.enabled = false;
+            highlighter.OnPuzzleCompleted();
         }
     }
 
@@ -292,9 +300,17 @@ public class SimpleCodePuzzle : MonoBehaviour
             inputDisplayText.text = "ВВОД: ОШИБКА!";
         }
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
 
+        // Генерируем новый код при неудаче
+        if (generateRandomCode)
+        {
+            GenerateRandomCode();
+        }
         currentInput = "";
+
+        // Пересоздаем UI с новым кодом
+        CreatePuzzleUI();
         UpdateInputDisplay();
 
         if (inputDisplayText != null)
@@ -312,18 +328,17 @@ public class SimpleCodePuzzle : MonoBehaviour
     {
         Debug.Log("Запуск пазла: " + gameObject.name);
 
+        // Генерируем новый код каждый раз при запуске если включено
+        if (generateRandomCode)
+        {
+            GenerateRandomCode();
+        }
+
         isPuzzleActive = true;
         currentInput = "";
 
-        if (puzzleContainer == null)
-        {
-            CreatePuzzleUI();
-        }
-
-        if (puzzleContainer != null)
-        {
-            puzzleContainer.SetActive(true);
-        }
+        // Всегда создаем новый UI
+        CreatePuzzleUI();
 
         SetPlayerControl(false);
         UpdateInputDisplay();
@@ -346,9 +361,22 @@ public class SimpleCodePuzzle : MonoBehaviour
         if (puzzleContainer != null)
         {
             puzzleContainer.SetActive(false);
+            // Не удаляем полностью, чтобы можно было переиспользовать при ошибках
+        }
+
+        // Восстанавливаем нормальный sorting order при закрытии пазла
+        if (mainCanvas != null)
+        {
+            mainCanvas.sortingOrder = 0;
         }
 
         SetPlayerControl(true);
+
+        // Уведомляем ObjectHighlighter что пазл закрыт
+        if (highlighter != null)
+        {
+            highlighter.OnPuzzleClosed();
+        }
     }
 
     void SetPlayerControl(bool enabled)
@@ -376,5 +404,19 @@ public class SimpleCodePuzzle : MonoBehaviour
         {
             codeDisplayText.text = "КОД: " + targetCode;
         }
+    }
+
+    public void SetCodeLength(int length)
+    {
+        codeLength = length;
+        if (generateRandomCode)
+        {
+            GenerateRandomCode();
+        }
+    }
+
+    public void SetRandomCodeGeneration(bool enabled)
+    {
+        generateRandomCode = enabled;
     }
 }

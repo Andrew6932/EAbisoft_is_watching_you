@@ -392,6 +392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62facfdf12ed683418fb786d4d09e78b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectHighlighter
+  highlightEnabled: 1
   highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   pulseSpeed: 2
   minAlpha: 0.3
@@ -399,6 +400,10 @@ MonoBehaviour:
   startHighlighted: 1
   interactionText: 'click E '
   textOffset: {x: 0, y: 2, z: 0}
+  interactionCooldown: 10
+  showCooldownText: 1
+  showCooldownVisual: 1
+  cooldownColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   codePuzzle: {fileID: 0}
   waitPuzzle: {fileID: 0}
   mathPuzzle: {fileID: 125111906}
@@ -1595,6 +1600,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62facfdf12ed683418fb786d4d09e78b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectHighlighter
+  highlightEnabled: 1
   highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   pulseSpeed: 2
   minAlpha: 0.3
@@ -1602,6 +1608,10 @@ MonoBehaviour:
   startHighlighted: 1
   interactionText: 'click E '
   textOffset: {x: 0, y: 2, z: 0}
+  interactionCooldown: 10
+  showCooldownText: 1
+  showCooldownVisual: 1
+  cooldownColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   codePuzzle: {fileID: 0}
   waitPuzzle: {fileID: 548892931}
   mathPuzzle: {fileID: 0}
@@ -20939,6 +20949,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62facfdf12ed683418fb786d4d09e78b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectHighlighter
+  highlightEnabled: 1
   highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   pulseSpeed: 2
   minAlpha: 0.3
@@ -20946,6 +20957,10 @@ MonoBehaviour:
   startHighlighted: 1
   interactionText: 'click E '
   textOffset: {x: 0, y: 2, z: 0}
+  interactionCooldown: 10
+  showCooldownText: 1
+  showCooldownVisual: 1
+  cooldownColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   codePuzzle: {fileID: 1294909592}
   waitPuzzle: {fileID: 0}
   mathPuzzle: {fileID: 0}
@@ -21753,6 +21768,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62facfdf12ed683418fb786d4d09e78b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectHighlighter
+  highlightEnabled: 1
   highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   pulseSpeed: 2
   minAlpha: 0.3
@@ -21760,6 +21776,10 @@ MonoBehaviour:
   startHighlighted: 1
   interactionText: 'click E '
   textOffset: {x: 0, y: 2, z: 0}
+  interactionCooldown: 10
+  showCooldownText: 1
+  showCooldownVisual: 1
+  cooldownColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   codePuzzle: {fileID: 0}
   waitPuzzle: {fileID: 0}
   mathPuzzle: {fileID: 0}
