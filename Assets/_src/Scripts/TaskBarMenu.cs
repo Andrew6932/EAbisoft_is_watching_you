@@ -18,7 +18,7 @@ public class TaskBarMenu : MonoBehaviour
         GameObject newBar = Instantiate(taskBarPrefab,container);
         TaskBarItem item = newBar.GetComponent<TaskBarItem>();
 
-        item.label.text = name;
+        item.label.text = input;
         items.Add(item);
     }
 
@@ -26,7 +26,7 @@ public class TaskBarMenu : MonoBehaviour
     {
         for(int i = 0; i < items.Count; i++)
         {
-            if(items[i].GetLabel() == name)
+            if(items[i].GetLabel() == input)
             {
                 Destroy(items[i].gameObject);
                 items.RemoveAt(i);
