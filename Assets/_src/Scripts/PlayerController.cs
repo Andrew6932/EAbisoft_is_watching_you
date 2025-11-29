@@ -1,59 +1,49 @@
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement Settings")]
     public float moveSpeed = 5f;
 
     private Rigidbody2D rb;
-    private Animator animator;
+    private AnimationManager animationManager;
     private Vector2 movement;
-    private Vector2 lastMovement = Vector2.down; 
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
+        animationManager = GetComponent<AnimationManager>();
     }
 
     void Update()
     {
-        HandleWASDInput();
-        UpdateAnimations();
+        HandleInput();
     }
 
-    void HandleWASDInput()
+    void HandleInput()
     {
         movement = Vector2.zero;
 
+        var keyboard = Keyboard.current;
+        if (keyboard == null) return;
 
-        if (Input.GetKey(KeyCode.W)) movement.y = 1;     
-        if (Input.GetKey(KeyCode.S)) movement.y = -1;     
-        if (Input.GetKey(KeyCode.A)) movement.x = -1;     
-        if (Input.GetKey(KeyCode.D)) movement.x = 1;      
+        if (keyboard.wKey.isPressed) movement.y = 1;
+        if (keyboard.sKey.isPressed) movement.y = -1;
+        if (keyboard.aKey.isPressed) movement.x = -1;
+        if (keyboard.dKey.isPressed) movement.x = 1;
 
-        movement = movement.normalized;
-
-        if (movement.magnitude > 0.1f)
+        // Обновляем анимации
+        if (animationManager != null)
         {
-            lastMovement = movement;
+            animationManager.UpdateAnimations(movement);
         }
-    }
-
-    void UpdateAnimations()
-    {
-        animator.SetFloat("MoveX", movement.x);
-        animator.SetFloat("MoveY", movement.y);
-        animator.SetFloat("LastMoveX", lastMovement.x);
-        animator.SetFloat("LastMoveY", lastMovement.y);
-        animator.SetBool("IsMoving", movement.magnitude > 0.1f);
     }
 
     void FixedUpdate()
     {
         if (movement.magnitude > 0.1f)
         {
-            rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+            rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
         }
     }
 }
