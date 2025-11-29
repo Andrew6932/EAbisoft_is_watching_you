@@ -14,14 +14,15 @@ public class ObjectHighlighter : MonoBehaviour
     public string interactionText = "Нажми E чтобы взаимодействовать";
     public Vector3 textOffset = new Vector3(0, 2f, 0);
 
+    [Header("Puzzle Settings")]
+    public SimpleCodePuzzle codePuzzle;
+    public WaitTimePuzzle waitPuzzle;
+
+
     private SpriteRenderer spriteRenderer;
-    private Material originalMaterial;
-    private Material highlightMaterial;
     private Color originalColor;
     private bool isHighlighted = false;
     private bool playerInRange = false;
-
-    // Ссылка на UI для показа текста
     private InteractionPromptUI promptUI;
 
     void Start()
@@ -29,15 +30,9 @@ public class ObjectHighlighter : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null)
         {
-            originalMaterial = spriteRenderer.material;
             originalColor = spriteRenderer.color;
-
-            // Создаем материал для подсветки
-            highlightMaterial = new Material(Shader.Find("Sprites/Default"));
-            highlightMaterial.color = highlightColor;
         }
 
-        // Создаем или находим UI для подсказок
         CreatePromptUI();
 
         if (startHighlighted)
@@ -52,17 +47,13 @@ public class ObjectHighlighter : MonoBehaviour
 
     void Update()
     {
-        if (isHighlighted)
+        // Пульсация подсветки
+        if (isHighlighted && spriteRenderer != null)
         {
-            // Пульсация альфа-канала
             float alpha = Mathf.Lerp(minAlpha, maxAlpha, (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f);
             Color pulseColor = highlightColor;
             pulseColor.a = alpha;
-
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.color = pulseColor;
-            }
+            spriteRenderer.color = pulseColor;
         }
 
         // Проверка взаимодействия
@@ -70,6 +61,7 @@ public class ObjectHighlighter : MonoBehaviour
         {
             OnInteract();
         }
+
     }
 
     void CreatePromptUI()
@@ -88,11 +80,6 @@ public class ObjectHighlighter : MonoBehaviour
     {
         isHighlighted = true;
 
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.material = highlightMaterial;
-        }
-
         // Показываем подсказку если игрок в зоне
         if (playerInRange && promptUI != null)
         {
@@ -106,7 +93,6 @@ public class ObjectHighlighter : MonoBehaviour
 
         if (spriteRenderer != null)
         {
-            spriteRenderer.material = originalMaterial;
             spriteRenderer.color = originalColor;
         }
 
@@ -144,17 +130,16 @@ public class ObjectHighlighter : MonoBehaviour
     {
         Debug.Log("Взаимодействие с: " + gameObject.name);
 
-        // Вызываем событие взаимодействия
-        // Можно добавить UnityEvent здесь
-
-        // Останавливаем подсветку после взаимодействия (опционально)
-        StopHighlight();
-    }
-
-    // Методы для внешнего управления
-    public void SetHighlightColor(Color color)
-    {
-        highlightColor = color;
+        // Запускаем код-пазл если он есть
+        if (codePuzzle != null)
+        {
+            codePuzzle.StartPuzzle();
+        }
+        // Или запускаем пазл ожидания если он есть
+        else if (waitPuzzle != null)
+        {
+            waitPuzzle.StartPuzzle();
+        }
     }
 
     public void SetInteractionText(string text)
@@ -169,14 +154,5 @@ public class ObjectHighlighter : MonoBehaviour
     public bool IsPlayerInRange()
     {
         return playerInRange;
-    }
-
-    void OnDestroy()
-    {
-        // Чистим материалы
-        if (highlightMaterial != null)
-        {
-            DestroyImmediate(highlightMaterial);
-        }
     }
 }
