@@ -53,6 +53,11 @@ public class GameCompletionBar : MonoBehaviour
         }
     }
 
+    public void addProgress(float input)
+    {
+        setProgress(input + progressImage.fillAmount,100f);
+    }
+
     private IEnumerator AnimateProgress(float progress, float speed){
         float time = 0;
         float initalProgress = progressImage.fillAmount;
