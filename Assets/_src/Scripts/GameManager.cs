@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal.Internal;
 
@@ -6,13 +7,14 @@ public class GameManager : MonoBehaviour
 {
     int gameCount = 0;
     float gameSuccessfulCount = 0f;
-    TimeBar timeBar;
-    GameCompletionBar gameCompletionBar;
+    public TimeBar timeBar;
+    public GameCompletionBar gameCompletionBar;
     
     
     private void Start()
     {
-        startGameIteration();
+        Debug.Log("GameManager Start");
+        StartCoroutine(startGameIteration());
     }
     
     public void addGameCount()
@@ -20,10 +22,12 @@ public class GameManager : MonoBehaviour
         gameCount++;
     }
 
-    public void startGameIteration()
+    public IEnumerator startGameIteration()
     {
-        gameCompletionBar.setProgress(0, 0);
-        timeBar.SetProgress(1f, -1f - (gameSuccessfulCount / 10f));
+        Debug.Log("Running GameManager");
+        gameCompletionBar.setProgress(0f, 100);
+        timeBar.SetProgress(1, -1f - (gameSuccessfulCount / 10f));
+        yield return new WaitForSeconds(1f);
         
     }
 
