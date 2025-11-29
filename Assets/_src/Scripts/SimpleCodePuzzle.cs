@@ -30,6 +30,9 @@ public class SimpleCodePuzzle : MonoBehaviour
     private GameObject player;
     private Canvas mainCanvas;
     private ObjectHighlighter highlighter;
+    [Header("Progress Bar")]
+    public GameCompletionBar progressBar;
+
 
     void Start()
     {
@@ -260,10 +263,15 @@ public class SimpleCodePuzzle : MonoBehaviour
     {
         if (currentInput == targetCode)
         {
+            float progress = 20 + Random.Range(-7, 7);
+            progressBar.addProgress(progress);
+
             StartCoroutine(PuzzleComplete());
         }
         else
         {
+            float progress = Random.Range(-7, -2);
+            progressBar.addProgress(progress);
             StartCoroutine(PuzzleFail());
         }
     }
@@ -276,7 +284,7 @@ public class SimpleCodePuzzle : MonoBehaviour
             inputDisplayText.text = "ВВОД: УСПЕХ!";
         }
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(0.2f);
 
         if (onPuzzleComplete != null)
         {

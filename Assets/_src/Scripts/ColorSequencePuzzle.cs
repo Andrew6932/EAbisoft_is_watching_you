@@ -249,6 +249,7 @@ public class ColorSequencePuzzle : MonoBehaviour
         {
             if (playerSequence[i] != correctSequence[i])
             {
+
                 StartCoroutine(PuzzleFail());
                 return;
             }
@@ -326,10 +327,14 @@ public class ColorSequencePuzzle : MonoBehaviour
         }
     }
 
+    [Header("Progress Bar")]
+    public GameCompletionBar progressBar;
     IEnumerator PuzzleComplete()
     {
         if (messageText != null)
         {
+            float progress = 20 + Random.Range(-7, 7);
+            progressBar.addProgress(progress);
             messageText.text = "✓ ПОСЛЕДОВАТЕЛЬНОСТЬ ВЕРНА!";
             messageText.color = Color.green;
         }
@@ -337,7 +342,7 @@ public class ColorSequencePuzzle : MonoBehaviour
         // Мигаем правильной последовательностью
         yield return StartCoroutine(ShowSuccessAnimation());
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.5f);
 
         if (onPuzzleComplete != null)
         {
@@ -349,6 +354,8 @@ public class ColorSequencePuzzle : MonoBehaviour
         // Уведомляем ObjectHighlighter о завершении пазла
         if (highlighter != null)
         {
+            
+
             highlighter.OnPuzzleCompleted();
         }
     }
