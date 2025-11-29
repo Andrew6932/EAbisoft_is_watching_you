@@ -16,9 +16,6 @@ public class SimpleCodePuzzle : MonoBehaviour
     public Color codeColor = Color.yellow;
     public Color inputColor = Color.green;
 
-    [Header("UI Container")]
-    public Transform uiContainer; // Перетащи сюда специальный объект для UI
-
     [Header("Events")]
     public UnityEngine.Events.UnityEvent onPuzzleStart;
     public UnityEngine.Events.UnityEvent onPuzzleComplete;
@@ -26,7 +23,7 @@ public class SimpleCodePuzzle : MonoBehaviour
 
     private string currentInput = "";
     private bool isPuzzleActive = false;
-    private GameObject puzzleUI;
+    private GameObject puzzleContainer;
     private Text codeDisplayText;
     private Text inputDisplayText;
     private GameObject player;
@@ -45,8 +42,6 @@ public class SimpleCodePuzzle : MonoBehaviour
         if (isPuzzleActive)
         {
             HandleKeyboardInput();
-
-            // УБРАТЬ для Overlay: UpdateTextPosition();
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
@@ -72,84 +67,113 @@ public class SimpleCodePuzzle : MonoBehaviour
 
     void CreatePuzzleUI()
     {
-        if (puzzleUI != null) return;
+        if (puzzleContainer != null) return;
 
-        // Создаем Canvas в Overlay режиме
-        GameObject canvasObj = new GameObject("PuzzleCanvas");
-        canvasObj.layer = LayerMask.NameToLayer("UI");
+        // Находим существующий Canvas
+        Canvas mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
+        if (mainCanvas == null)
+        {
+            Debug.LogError("Canvas не найден на сцене!");
+            return;
+        }
 
-        Canvas canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 9999;
+        mainCanvas.sortingOrder = 10;
+        // Создаем контейнер внутри существующего Canvas
+        puzzleContainer = CreateUIElement("CodePuzzleContainer", mainCanvas.transform);
+        RectTransform containerRect = puzzleContainer.GetComponent<RectTransform>();
 
-        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
-
-        canvasObj.AddComponent<GraphicRaycaster>();
-
-        // Контейнер для центрирования
-        GameObject container = CreateUIElement("Container", canvasObj.transform);
-        RectTransform containerRect = container.GetComponent<RectTransform>();
+        // Настраиваем контейнер - строго по центру экрана
         containerRect.anchorMin = new Vector2(0.5f, 0.5f);
         containerRect.anchorMax = new Vector2(0.5f, 0.5f);
         containerRect.pivot = new Vector2(0.5f, 0.5f);
-        containerRect.sizeDelta = new Vector2(400, 100);
-        containerRect.anchoredPosition = new Vector2(0, 150); // Выше по центру
+        containerRect.sizeDelta = new Vector2(400, 120);
+        containerRect.anchoredPosition = Vector2.zero;
+        containerRect.localScale = Vector3.one;
 
-        // Строка с кодом
-        GameObject codeDisplay = CreateUIElement("CodeDisplay", container.transform);
+        // Добавляем фон для лучшей читаемости
+        GameObject background = CreateUIElement("Background", puzzleContainer.transform);
+        Image bgImage = background.AddComponent<Image>();
+        bgImage.color = new Color(0, 0, 0, 0.85f);
+        RectTransform bgRect = background.GetComponent<RectTransform>();
+        bgRect.anchorMin = Vector2.zero;
+        bgRect.anchorMax = Vector2.one;
+        bgRect.offsetMin = Vector2.zero; // Важно!
+        bgRect.offsetMax = Vector2.zero; // Важно!
+        bgRect.localScale = Vector3.one;
+
+        // Строка с кодом - позиционируем относительно контейнера
+        GameObject codeDisplay = CreateUIElement("CodeDisplay", puzzleContainer.transform);
         codeDisplayText = codeDisplay.AddComponent<Text>();
         codeDisplayText.text = "КОД: " + targetCode;
 
-        if (textFont != null) codeDisplayText.font = textFont;
-        else codeDisplayText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        if (textFont != null)
+            codeDisplayText.font = textFont;
+        else
+            codeDisplayText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
 
-        // Увеличиваем шрифт и настраиваем для четкости
-        codeDisplayText.fontSize = 22; // Чуть больше
+        codeDisplayText.fontSize = 24;
         codeDisplayText.color = codeColor;
         codeDisplayText.alignment = TextAnchor.MiddleCenter;
         codeDisplayText.fontStyle = FontStyle.Bold;
         codeDisplayText.resizeTextForBestFit = false;
         codeDisplayText.horizontalOverflow = HorizontalWrapMode.Overflow;
         codeDisplayText.verticalOverflow = VerticalWrapMode.Overflow;
-        codeDisplayText.supportRichText = false; // Отключаем rich text для четкости
 
         RectTransform codeRect = codeDisplay.GetComponent<RectTransform>();
-        codeRect.anchorMin = new Vector2(0.5f, 0.6f);
-        codeRect.anchorMax = new Vector2(0.5f, 0.6f);
-        codeRect.pivot = new Vector2(0.5f, 0.5f);
-        codeRect.sizeDelta = new Vector2(380, 30);
+        codeRect.anchorMin = new Vector2(0f, 0.66f);  // Слева, 2/3 высоты
+        codeRect.anchorMax = new Vector2(1f, 0.9f);   // Справа, 90% высоты
+        codeRect.offsetMin = new Vector2(10f, 0f);    // Отступ слева
+        codeRect.offsetMax = new Vector2(-10f, 0f);   // Отступ справа
+        codeRect.localScale = Vector3.one;
 
-        // Строка с вводом
-        GameObject inputDisplay = CreateUIElement("InputDisplay", container.transform);
+        // Строка с вводом - позиционируем относительно контейнера
+        GameObject inputDisplay = CreateUIElement("InputDisplay", puzzleContainer.transform);
         inputDisplayText = inputDisplay.AddComponent<Text>();
 
-        if (textFont != null) inputDisplayText.font = textFont;
-        else inputDisplayText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        if (textFont != null)
+            inputDisplayText.font = textFont;
+        else
+            inputDisplayText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
 
-        inputDisplayText.fontSize = 22; // Чуть больше
+        inputDisplayText.fontSize = 24;
         inputDisplayText.color = inputColor;
         inputDisplayText.alignment = TextAnchor.MiddleCenter;
         inputDisplayText.fontStyle = FontStyle.Bold;
         inputDisplayText.resizeTextForBestFit = false;
         inputDisplayText.horizontalOverflow = HorizontalWrapMode.Overflow;
         inputDisplayText.verticalOverflow = VerticalWrapMode.Overflow;
-        inputDisplayText.supportRichText = false;
 
         RectTransform inputRect = inputDisplay.GetComponent<RectTransform>();
-        inputRect.anchorMin = new Vector2(0.5f, 0.4f);
-        inputRect.anchorMax = new Vector2(0.5f, 0.4f);
-        inputRect.pivot = new Vector2(0.5f, 0.5f);
-        inputRect.sizeDelta = new Vector2(380, 30);
+        inputRect.anchorMin = new Vector2(0f, 0.33f); // Слева, 1/3 высоты
+        inputRect.anchorMax = new Vector2(1f, 0.66f); // Справа, 2/3 высоты
+        inputRect.offsetMin = new Vector2(10f, 0f);   // Отступ слева
+        inputRect.offsetMax = new Vector2(-10f, 0f);  // Отступ справа
+        inputRect.localScale = Vector3.one;
 
-        puzzleUI = canvasObj;
+        // Подсказка - позиционируем относительно контейнера
+        GameObject hintDisplay = CreateUIElement("Hint", puzzleContainer.transform);
+        Text hintText = hintDisplay.AddComponent<Text>();
+        hintText.text = "Введите код и нажмите Enter (ESC - выход)";
+
+        if (textFont != null)
+            hintText.font = textFont;
+        else
+            hintText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+
+        hintText.fontSize = 14;
+        hintText.color = Color.gray;
+        hintText.alignment = TextAnchor.MiddleCenter;
+
+        RectTransform hintRect = hintDisplay.GetComponent<RectTransform>();
+        hintRect.anchorMin = new Vector2(0f, 0f);     // Слева снизу
+        hintRect.anchorMax = new Vector2(1f, 0.33f);  // Справа, 1/3 высоты
+        hintRect.offsetMin = new Vector2(10f, 5f);    // Отступы
+        hintRect.offsetMax = new Vector2(-10f, -5f);
+        hintRect.localScale = Vector3.one;
+
         UpdateInputDisplay();
-        puzzleUI.SetActive(false);
+        puzzleContainer.SetActive(false);
     }
-
 
     GameObject CreateUIElement(string name, Transform parent)
     {
@@ -158,22 +182,6 @@ public class SimpleCodePuzzle : MonoBehaviour
         element.AddComponent<RectTransform>();
         return element;
     }
-
-    void UpdateTextPosition()
-    {
-        if (player == null || puzzleUI == null) return;
-
-        Vector3 headPosition = player.transform.position + Vector3.up * 1.8f;
-        puzzleUI.transform.position = headPosition;
-
-        // Смотрит на камеру, но без переворота
-        Camera cam = Camera.main;
-        if (cam != null)
-        {
-            puzzleUI.transform.LookAt(puzzleUI.transform.position + cam.transform.forward);
-        }
-    }
-
 
     void HandleKeyboardInput()
     {
@@ -307,28 +315,14 @@ public class SimpleCodePuzzle : MonoBehaviour
         isPuzzleActive = true;
         currentInput = "";
 
-        // Создаем UI только когда игрок взаимодействует
-        if (puzzleUI == null)
+        if (puzzleContainer == null)
         {
             CreatePuzzleUI();
         }
 
-        if (puzzleUI != null)
+        if (puzzleContainer != null)
         {
-            puzzleUI.SetActive(true);
-
-            // УБРАТЬ World Space позиционирование для Overlay
-            // if (player != null)
-            // {
-            //     Vector3 playerPosition = player.transform.position;
-            //     puzzleUI.transform.position = playerPosition + new Vector3(0, 2f, 0);
-            //
-            //     Camera mainCamera = Camera.main;
-            //     if (mainCamera != null)
-            //     {
-            //         puzzleUI.transform.rotation = mainCamera.transform.rotation;
-            //     }
-            // }
+            puzzleContainer.SetActive(true);
         }
 
         SetPlayerControl(false);
@@ -349,14 +343,9 @@ public class SimpleCodePuzzle : MonoBehaviour
     {
         isPuzzleActive = false;
 
-        if (puzzleUI != null)
+        if (puzzleContainer != null)
         {
-            // Вариант 1: Просто скрываем (можно использовать снова)
-            puzzleUI.SetActive(false);
-
-            // Вариант 2: Полностью уничтожаем (создаем заново при следующем взаимодействии)
-            // Destroy(puzzleUI);
-            // puzzleUI = null;
+            puzzleContainer.SetActive(false);
         }
 
         SetPlayerControl(true);
@@ -364,11 +353,19 @@ public class SimpleCodePuzzle : MonoBehaviour
 
     void SetPlayerControl(bool enabled)
     {
-        // Заменяем устаревший метод
         PlayerController player = FindAnyObjectByType<PlayerController>();
         if (player != null)
         {
             player.enabled = enabled;
+        }
+    }
+
+    // Очистка при уничтожении
+    void OnDestroy()
+    {
+        if (puzzleContainer != null)
+        {
+            Destroy(puzzleContainer);
         }
     }
 
