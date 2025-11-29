@@ -5,14 +5,18 @@ using UnityEngine.Rendering.Universal.Internal;
 
 public class GameManager : MonoBehaviour
 {
-    int gameCount = 0;
-    float gameSuccessfulCount = 0f;
+    int gameCount;
+    float gameSuccessfulCount;
     public TimeBar timeBar;
     public GameCompletionBar gameCompletionBar;
+    bool gameRelease;
     
     
     private void Start()
     {
+        gameCount = 0;
+        gameSuccessfulCount = 0f;
+        gameRelease = false;
         Debug.Log("GameManager Start");
         StartCoroutine(startGameIteration());
     }
@@ -26,8 +30,19 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Running GameManager");
         gameCompletionBar.setProgress(0f, 100);
-        timeBar.SetProgress(1, -1f - (gameSuccessfulCount / 10f));
+        timeBar.SetProgress(0, 0.01f + (gameSuccessfulCount * 0.01f));
         yield return new WaitForSeconds(1f);
+        while (true)
+        {
+            checkTimers();
+            yield return new WaitForSeconds(1f);
+            if (gameRelease)
+            {
+                gameRelease = true;
+                break;
+            }
+        }
+        Debug.Log("End of startGameManager");
         
     }
 
@@ -48,13 +63,18 @@ public class GameManager : MonoBehaviour
         else
         {
             float percent = 1f - gameCompletionBar.getProgress();
-
+            if (isFired(percent))
+            {
+                lostGame();
+            }
         }
     }
 
     public void lostGame()
     {
         Debug.Log("Game Lost!");
+        gameRelease = true;
+        StopCoroutine(startGameIteration());
     }
 
     public bool isFired(float percent)
