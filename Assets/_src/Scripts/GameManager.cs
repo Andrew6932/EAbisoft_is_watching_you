@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal.Internal;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -38,7 +39,7 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
             if (gameRelease)
             {
-                gameRelease = true;
+                gameRelease = false;
                 break;
             }
         }
@@ -56,6 +57,7 @@ public class GameManager : MonoBehaviour
 
     public void incompleteLaunch()
     {
+        gameRelease = true;
         if(gameCompletionBar.getProgress() <= 0.5f)
         {
             lostGame();
@@ -73,8 +75,8 @@ public class GameManager : MonoBehaviour
     public void lostGame()
     {
         Debug.Log("Game Lost!");
-        gameRelease = true;
         StopCoroutine(startGameIteration());
+        SceneManager.LoadScene("LoseScreen",LoadSceneMode.Single);
     }
 
     public bool isFired(float percent)
