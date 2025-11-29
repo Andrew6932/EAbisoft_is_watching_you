@@ -34,6 +34,7 @@ public class ObjectHighlighter : MonoBehaviour
     private InteractionPromptUI promptUI;
     private bool isOnCooldown = false;
     private float cooldownTimer = 0f;
+    public TaskBarMenu taskBarMenu;
 
     void Start()
     {
@@ -53,6 +54,24 @@ public class ObjectHighlighter : MonoBehaviour
         else
         {
             StopHighlight();
+        }
+
+        switch (gameObject.name)
+        {
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
+                taskBarMenu.AddNewTaskBar("Program Combat AI");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_38":
+                taskBarMenu.AddNewTaskBar("Edit Graphics");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_45":
+                taskBarMenu.AddNewTaskBar("Program Game");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_36":
+                taskBarMenu.AddNewTaskBar("Consult with Manager");
+                break;
+            default:
+                break;
         }
     }
 
@@ -231,6 +250,23 @@ public class ObjectHighlighter : MonoBehaviour
         {
             promptUI.Hide();
         }
+        switch (gameObject.name)
+        {
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
+                taskBarMenu.RemoveTaskBar("Program Combat AI");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_38":
+                taskBarMenu.RemoveTaskBar("Edit Graphics");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_45":
+                taskBarMenu.RemoveTaskBar("Program Game");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_36":
+                taskBarMenu.RemoveTaskBar("Consult with Manager");
+                break;
+            default:
+                break;
+        }
 
         Debug.Log("Начат кулдаун для: " + gameObject.name);
     }
@@ -254,6 +290,25 @@ public class ObjectHighlighter : MonoBehaviour
         {
             promptUI.UpdateText(interactionText);
             promptUI.Show();
+        }
+
+        Debug.Log(gameObject.name);
+        switch (gameObject.name)
+        {
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
+                taskBarMenu.AddNewTaskBar("Program Combat AI");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_38":
+                taskBarMenu.AddNewTaskBar("Edit Graphics");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_45":
+                taskBarMenu.AddNewTaskBar("Program Game");
+                break;
+            case "Modern_Office_MV_2_TILESETS_B-C-D-E_36":
+                taskBarMenu.AddNewTaskBar("Consult with Manager");
+                break;
+            default:
+                break;
         }
 
         Debug.Log("Кулдаун завершен для: " + gameObject.name);

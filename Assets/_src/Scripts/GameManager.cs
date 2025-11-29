@@ -119,7 +119,7 @@ public class GameManager : MonoBehaviour
     public bool isFired(float percent)
     {
         System.Random rnd = new System.Random();
-        float num = rnd.Next(1, 100) / 100;
+        float num = (float)rnd.Next(1, 100) / 100f;
         return num <= percent;
     }
 }

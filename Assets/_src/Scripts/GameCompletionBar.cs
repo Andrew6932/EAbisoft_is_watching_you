@@ -18,6 +18,7 @@ public class GameCompletionBar : MonoBehaviour
     private Coroutine animationCoroutine;
 
     private void Start(){
+        setProgress(0f, 100f);
         if(progressImage.type != Image.Type.Filled){
             Debug.LogError($"{name}'s progressImage is not of type Filled");
             this.enabled = false;
