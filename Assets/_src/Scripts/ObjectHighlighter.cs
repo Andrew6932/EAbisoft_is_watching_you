@@ -18,6 +18,7 @@ public class ObjectHighlighter : MonoBehaviour
     public SimpleCodePuzzle codePuzzle;
     public WaitTimePuzzle waitPuzzle;
     public MathPuzzle mathPuzzle;
+    public ColorSequencePuzzle colorSequencePuzzle;
 
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
@@ -143,6 +144,10 @@ public class ObjectHighlighter : MonoBehaviour
         else if (mathPuzzle != null) // Добавляем проверку для математического пазла
         {
             mathPuzzle.StartPuzzle();
+        }
+        else if (colorSequencePuzzle != null) // Добавляем проверку для пазла с последовательностью
+        {
+            colorSequencePuzzle.StartPuzzle();
         }
     }
 

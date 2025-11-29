@@ -402,6 +402,7 @@ MonoBehaviour:
   codePuzzle: {fileID: 0}
   waitPuzzle: {fileID: 0}
   mathPuzzle: {fileID: 125111906}
+  colorSequencePuzzle: {fileID: 0}
 --- !u!1 &130278306
 GameObject:
   m_ObjectHideFlags: 0
@@ -1649,6 +1650,7 @@ MonoBehaviour:
   codePuzzle: {fileID: 0}
   waitPuzzle: {fileID: 548892931}
   mathPuzzle: {fileID: 0}
+  colorSequencePuzzle: {fileID: 0}
 --- !u!114 &548892931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20994,6 +20996,7 @@ MonoBehaviour:
   codePuzzle: {fileID: 1294909592}
   waitPuzzle: {fileID: 0}
   mathPuzzle: {fileID: 0}
+  colorSequencePuzzle: {fileID: 0}
 --- !u!114 &1294909592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21625,6 +21628,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1895718020}
   - component: {fileID: 1895718019}
+  - component: {fileID: 1895718023}
+  - component: {fileID: 1895718022}
+  - component: {fileID: 1895718021}
   m_Layer: 0
   m_Name: Modern_Office_MV_2_TILESETS_B-C-D-E_38
   m_TagString: Untagged
@@ -21705,6 +21711,107 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1895718021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1895718018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c1220dda94777548ad9783958f3a8e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ColorSequencePuzzle
+  sequenceLength: 4
+  showTime: 1
+  delayBetweenColors: 1
+  availableColors:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 1, g: 0.30269474, b: 0, a: 1}
+  textFont: {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
+  fontSize: 24
+  textColor: {r: 0, g: 0, b: 0, a: 1}
+  onPuzzleStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onPuzzleComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  onPuzzleFail:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1895718022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1895718018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62facfdf12ed683418fb786d4d09e78b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectHighlighter
+  highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  pulseSpeed: 2
+  minAlpha: 0.3
+  maxAlpha: 1
+  startHighlighted: 1
+  interactionText: 'click E '
+  textOffset: {x: 0, y: 2, z: 0}
+  codePuzzle: {fileID: 0}
+  waitPuzzle: {fileID: 0}
+  mathPuzzle: {fileID: 0}
+  colorSequencePuzzle: {fileID: 1895718021}
+--- !u!61 &1895718023
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1895718018}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 3, y: 4.6}
+    newSize: {x: 3, y: 4.6}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 3, y: 4.6}
+  m_EdgeRadius: 0
 --- !u!1 &1920252267
 GameObject:
   m_ObjectHideFlags: 0
