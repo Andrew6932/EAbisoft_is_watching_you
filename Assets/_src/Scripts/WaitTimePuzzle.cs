@@ -23,9 +23,9 @@ public class WaitTimePuzzle : MonoBehaviour
     private bool isPuzzleActive = false;
     private bool playerInZone = false;
     private float currentWaitTime = 0f;
-    private GameObject puzzleUI;
+    private GameObject puzzleContainer; // Изменил имя с puzzleUI на puzzleContainer
     private TextMeshProUGUI progressText;
-    private Image progressBar;
+    private UnityEngine.UI.Image progressBar; // Указал полный namespace
     private GameObject player;
 
     void Start()
@@ -68,32 +68,43 @@ public class WaitTimePuzzle : MonoBehaviour
 
     void CreatePuzzleUI()
     {
-        if (puzzleUI != null) return;
+        if (puzzleContainer != null) return;
 
-        // Создаем Canvas
-        GameObject canvasObj = new GameObject("WaitPuzzleCanvas");
-        canvasObj.layer = LayerMask.NameToLayer("UI");
+        // Находим существующий Canvas
+        Canvas mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
+        if (mainCanvas == null)
+        {
+            Debug.LogError("Canvas не найден на сцене!");
+            return;
+        }
 
-        Canvas canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 9998;
+        mainCanvas.sortingOrder = 10;
 
-        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
+        // Создаем контейнер внутри существующего Canvas
+        puzzleContainer = CreateUIElement("WaitTimeContainer", mainCanvas.transform);
+        RectTransform containerRect = puzzleContainer.GetComponent<RectTransform>();
 
-        canvasObj.AddComponent<GraphicRaycaster>();
-
-        // Контейнер
-        GameObject container = CreateUIElement("Container", canvasObj.transform);
-        RectTransform containerRect = container.GetComponent<RectTransform>();
-        containerRect.anchorMin = new Vector2(0.5f, 0.7f);
-        containerRect.anchorMax = new Vector2(0.5f, 0.7f);
+        // Настраиваем контейнер - строго по центру экрана
+        containerRect.anchorMin = new Vector2(0.5f, 0.5f);
+        containerRect.anchorMax = new Vector2(0.5f, 0.5f);
         containerRect.pivot = new Vector2(0.5f, 0.5f);
-        containerRect.sizeDelta = new Vector2(400, 100);
+        containerRect.sizeDelta = new Vector2(400, 120);
+        containerRect.anchoredPosition = Vector2.zero;
+        containerRect.localScale = Vector3.one;
 
-        // Текст прогресса
-        GameObject progressTextObj = CreateUIElement("ProgressText", container.transform);
+        // Добавляем фон для лучшей читаемости
+        GameObject background = CreateUIElement("Background", puzzleContainer.transform);
+        UnityEngine.UI.Image bgImage = background.AddComponent<UnityEngine.UI.Image>(); // Указал полный namespace
+        bgImage.color = new Color(0, 0, 0, 0.85f);
+        RectTransform bgRect = background.GetComponent<RectTransform>();
+        bgRect.anchorMin = Vector2.zero;
+        bgRect.anchorMax = Vector2.one;
+        bgRect.offsetMin = Vector2.zero;
+        bgRect.offsetMax = Vector2.zero;
+        bgRect.localScale = Vector3.one;
+
+        // Текст прогресса - позиционируем относительно контейнера
+        GameObject progressTextObj = CreateUIElement("ProgressText", puzzleContainer.transform);
         progressText = progressTextObj.AddComponent<TextMeshProUGUI>();
 
         if (textFont != null)
@@ -104,48 +115,76 @@ public class WaitTimePuzzle : MonoBehaviour
         progressText.alignment = TextAlignmentOptions.Center;
         progressText.text = "Ожидание...";
         progressText.enableAutoSizing = false;
+        progressText.overflowMode = TextOverflowModes.Overflow;
 
         RectTransform textRect = progressTextObj.GetComponent<RectTransform>();
-        textRect.anchorMin = new Vector2(0.5f, 0.6f);
-        textRect.anchorMax = new Vector2(0.5f, 0.6f);
-        textRect.sizeDelta = new Vector2(380, 30);
+        textRect.anchorMin = new Vector2(0f, 0.66f);  // Слева, 2/3 высоты
+        textRect.anchorMax = new Vector2(1f, 0.9f);   // Справа, 90% высоты
+        textRect.offsetMin = new Vector2(10f, 0f);    // Отступ слева
+        textRect.offsetMax = new Vector2(-10f, 0f);   // Отступ справа
+        textRect.localScale = Vector3.one;
 
-        // Прогресс бар (если включен)
+        // Прогресс бар (если включен) - позиционируем относительно контейнера
         if (showProgress)
         {
-            GameObject progressBarObj = CreateUIElement("ProgressBar", container.transform);
+            GameObject progressBarObj = CreateUIElement("ProgressBar", puzzleContainer.transform);
 
             // Фон прогресс бара
             GameObject bgObj = CreateUIElement("Background", progressBarObj.transform);
-            Image bgImage = bgObj.AddComponent<Image>();
-            bgImage.color = new Color(0.3f, 0.3f, 0.3f, 0.7f);
+            UnityEngine.UI.Image bgImageBar = bgObj.AddComponent<UnityEngine.UI.Image>(); // Указал полный namespace
+            bgImageBar.color = new Color(0.3f, 0.3f, 0.3f, 0.7f);
 
-            RectTransform bgRect = bgObj.GetComponent<RectTransform>();
-            bgRect.anchorMin = new Vector2(0f, 0f);
-            bgRect.anchorMax = new Vector2(1f, 1f);
-            bgRect.sizeDelta = Vector2.zero;
+            RectTransform bgRectBar = bgObj.GetComponent<RectTransform>();
+            bgRectBar.anchorMin = Vector2.zero;
+            bgRectBar.anchorMax = Vector2.one;
+            bgRectBar.offsetMin = Vector2.zero;
+            bgRectBar.offsetMax = Vector2.zero;
+            bgRectBar.localScale = Vector3.one;
 
             // Заполнение прогресс бара
             GameObject fillObj = CreateUIElement("Fill", progressBarObj.transform);
-            progressBar = fillObj.AddComponent<Image>();
+            progressBar = fillObj.AddComponent<UnityEngine.UI.Image>(); // Указал полный namespace
             progressBar.color = progressColor;
-            progressBar.type = Image.Type.Filled;
-            progressBar.fillMethod = Image.FillMethod.Horizontal;
+            progressBar.type = UnityEngine.UI.Image.Type.Filled;
+            progressBar.fillMethod = UnityEngine.UI.Image.FillMethod.Horizontal;
             progressBar.fillAmount = 0f;
 
             RectTransform fillRect = fillObj.GetComponent<RectTransform>();
-            fillRect.anchorMin = new Vector2(0f, 0f);
-            fillRect.anchorMax = new Vector2(1f, 1f);
-            fillRect.sizeDelta = Vector2.zero;
+            fillRect.anchorMin = Vector2.zero;
+            fillRect.anchorMax = Vector2.one;
+            fillRect.offsetMin = Vector2.zero;
+            fillRect.offsetMax = Vector2.zero;
+            fillRect.localScale = Vector3.one;
 
             RectTransform barRect = progressBarObj.GetComponent<RectTransform>();
-            barRect.anchorMin = new Vector2(0.1f, 0.3f);
-            barRect.anchorMax = new Vector2(0.9f, 0.4f);
-            barRect.sizeDelta = new Vector2(0, 15);
+            barRect.anchorMin = new Vector2(0f, 0.33f);   // Слева, 1/3 высоты
+            barRect.anchorMax = new Vector2(1f, 0.66f);   // Справа, 2/3 высоты
+            barRect.offsetMin = new Vector2(20f, 5f);     // Отступы
+            barRect.offsetMax = new Vector2(-20f, -5f);
+            barRect.localScale = Vector3.one;
         }
 
-        puzzleUI = canvasObj;
-        puzzleUI.SetActive(false);
+        // Подсказка - позиционируем относительно контейнера
+        GameObject hintDisplay = CreateUIElement("Hint", puzzleContainer.transform);
+        TextMeshProUGUI hintText = hintDisplay.AddComponent<TextMeshProUGUI>();
+        hintText.text = "Стойте в зоне ожидания (ESC - выход)";
+
+        if (textFont != null)
+            hintText.font = textFont;
+
+        hintText.fontSize = fontSize - 4;
+        hintText.color = Color.gray;
+        hintText.alignment = TextAlignmentOptions.Center;
+        hintText.enableAutoSizing = false;
+
+        RectTransform hintRect = hintDisplay.GetComponent<RectTransform>();
+        hintRect.anchorMin = new Vector2(0f, 0f);     // Слева снизу
+        hintRect.anchorMax = new Vector2(1f, 0.33f);  // Справа, 1/3 высоты
+        hintRect.offsetMin = new Vector2(10f, 5f);    // Отступы
+        hintRect.offsetMax = new Vector2(-10f, -5f);
+        hintRect.localScale = Vector3.one;
+
+        puzzleContainer.SetActive(false);
     }
 
     GameObject CreateUIElement(string name, Transform parent)
@@ -239,14 +278,14 @@ public class WaitTimePuzzle : MonoBehaviour
         isPuzzleActive = true;
         currentWaitTime = 0f;
 
-        if (puzzleUI == null)
+        if (puzzleContainer == null)
         {
             CreatePuzzleUI();
         }
 
-        if (puzzleUI != null)
+        if (puzzleContainer != null)
         {
-            puzzleUI.SetActive(true);
+            puzzleContainer.SetActive(true);
         }
 
         SetPlayerControl(false);
@@ -262,9 +301,9 @@ public class WaitTimePuzzle : MonoBehaviour
         isPuzzleActive = false;
         playerInZone = false;
 
-        if (puzzleUI != null)
+        if (puzzleContainer != null)
         {
-            puzzleUI.SetActive(false);
+            puzzleContainer.SetActive(false);
         }
 
         SetPlayerControl(true);
