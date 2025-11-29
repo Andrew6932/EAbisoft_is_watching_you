@@ -2464,7 +2464,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   progressImage: {fileID: 884603694}
-  defaultSpeed: 1
+  defaultSpeed: 0.5
   onProgress:
     m_PersistentCalls:
       m_Calls:
@@ -21224,7 +21224,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimeBar
   ProgressImage: {fileID: 1343455291}
-  DefaultSpeed: 1
+  DefaultSpeed: 0.5
   OnProgress:
     m_PersistentCalls:
       m_Calls:

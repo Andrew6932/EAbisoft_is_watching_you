@@ -57,7 +57,7 @@ public class GameCompletionBar : MonoBehaviour
     {
         float progressIncrement = inputPercent / 100f;
         float newProgress = progressImage.fillAmount + progressIncrement;
-        setProgress(newProgress, 100f);
+        setProgress(newProgress, 20f);
     }
 
     private IEnumerator AnimateProgress(float progress, float speed){
