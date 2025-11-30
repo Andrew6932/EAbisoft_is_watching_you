@@ -6,7 +6,7 @@ using System.Collections;
 public class WaitTimePuzzle : MonoBehaviour
 {
     [Header("Puzzle Settings")]
-    public float waitTimeRequired = 5f; // Время в секундах
+    public float waitTimeRequired = 5f;
     public bool showProgress = true;
 
     [Header("UI Settings")]
@@ -44,10 +44,6 @@ public class WaitTimePuzzle : MonoBehaviour
             UpdateWaitProgress();
         }
 
-        //if (isPuzzleActive && Input.GetKeyDown(KeyCode.Escape))
-        //{
-        //    ClosePuzzle();
-        //}
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -78,14 +74,14 @@ public class WaitTimePuzzle : MonoBehaviour
 
     void CreatePuzzleUI()
     {
-        // Удаляем старый UI если есть
+
         if (puzzleContainer != null)
         {
             Destroy(puzzleContainer);
             puzzleContainer = null;
         }
 
-        // Находим существующий Canvas
+
         mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
         if (mainCanvas == null)
         {
@@ -95,7 +91,7 @@ public class WaitTimePuzzle : MonoBehaviour
 
         mainCanvas.sortingOrder = 10;
 
-        // Создаем контейнер внутри существующего Canvas
+
         puzzleContainer = CreateUIElement("WaitTimeContainer", mainCanvas.transform);
         RectTransform containerRect = puzzleContainer.GetComponent<RectTransform>();
 
@@ -103,7 +99,7 @@ public class WaitTimePuzzle : MonoBehaviour
         containerRect.anchorMin = new Vector2(0.5f, 0.5f);
         containerRect.anchorMax = new Vector2(0.5f, 0.5f);
         containerRect.pivot = new Vector2(0.5f, 0.5f);
-        containerRect.sizeDelta = new Vector2(400, 120); // Исходный размер
+        containerRect.sizeDelta = new Vector2(400, 120); 
         containerRect.anchoredPosition = Vector2.zero;
         containerRect.localScale = Vector3.one;
 
@@ -126,7 +122,7 @@ public class WaitTimePuzzle : MonoBehaviour
         progressText.fontSize = fontSize;
         progressText.color = progressColor;
         progressText.alignment = TextAlignmentOptions.Center;
-        progressText.text = "Ожидание...";
+        progressText.text = "wait...";
         progressText.enableAutoSizing = false;
         progressText.overflowMode = TextOverflowModes.Overflow;
 
@@ -246,7 +242,7 @@ public class WaitTimePuzzle : MonoBehaviour
 
     void StopWait()
     {
-        Debug.Log("Остановка ожидания, игрок вышел из зоны");
+
         if (progressText != null)
         {
             progressText.color = Color.red;
@@ -399,7 +395,7 @@ public class WaitTimePuzzle : MonoBehaviour
         }
         if (progressText != null)
         {
-            progressText.text = "Ожидание...";
+            progressText.text = "wait...";
             progressText.color = progressColor;
         }
     }

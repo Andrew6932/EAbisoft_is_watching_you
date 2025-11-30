@@ -21,11 +21,10 @@ public class TaskBarMenu : MonoBehaviour
 
         item.label.text = input;
 
-        // Если это задача менеджера, включаем красное мигание и обратный отсчет
         if (input == "Consult with Manager")
         {
             item.EnableRedBlinking();
-            item.StartCountdown(10f); // 10 секунд обратного отсчета
+            item.StartCountdown(10f); 
         }
 
         items.Add(item);
@@ -44,7 +43,6 @@ public class TaskBarMenu : MonoBehaviour
         }
     }
 
-    // Метод для принудительного удаления по компоненту
     public void RemoveTaskBar(TaskBarItem item)
     {
         if (items.Contains(item))

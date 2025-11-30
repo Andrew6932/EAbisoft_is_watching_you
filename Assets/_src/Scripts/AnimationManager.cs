@@ -14,7 +14,7 @@ public class AnimationManager : MonoBehaviour
     private Vector2 lastDirection = Vector2.down;
     private string currentState = "";
 
-    // Названия состояний анимаций
+ 
     private readonly string[] walkStates = { "walk down", "walk up", "walk left", "walk right" };
     private readonly string[] idleStates = { "down", "up", "left", "right" };
 
@@ -23,7 +23,7 @@ public class AnimationManager : MonoBehaviour
         animator = GetComponent<Animator>();
         SetupDefaultParameters();
 
-        // Устанавливаем нормальную скорость анимаций
+
         if (animator != null)
         {
             animator.speed = 1f;
@@ -54,13 +54,13 @@ public class AnimationManager : MonoBehaviour
         Vector2 movement = movementInput.normalized;
         bool isMoving = movement.magnitude > 0.1f;
 
-        // Запоминаем последнее направление при движении
+
         if (isMoving)
         {
             lastDirection = movement;
         }
 
-        // Плавно изменяем параметры вместо резких скачков
+    
         SmoothSetFloat("MoveX", movement.x);
         SmoothSetFloat("MoveY", movement.y);
         SmoothSetFloat("LastMoveX", lastDirection.x);
@@ -69,7 +69,7 @@ public class AnimationManager : MonoBehaviour
         animator.SetBool("IsMoving", isMoving);
     }
 
-    // Плавное изменение float параметров
+
     private void SmoothSetFloat(string paramName, float targetValue)
     {
         float currentValue = animator.GetFloat(paramName);
@@ -77,22 +77,22 @@ public class AnimationManager : MonoBehaviour
         animator.SetFloat(paramName, newValue);
     }
 
-    // Метод для принудительного завершения текущей анимации
+
     public void CompleteCurrentAnimation()
     {
         if (animator != null)
         {
             AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            animator.Play(stateInfo.fullPathHash, 0, 1f); // Перематываем на конец анимации
+            animator.Play(stateInfo.fullPathHash, 0, 1f); 
         }
     }
 
-    // Для отладки
+
     [ContextMenu("Test Walk Up")]
     void TestWalkUp()
     {
         UpdateAnimations(Vector2.up);
-        Invoke("StopMoving", 1f); // Останавливаем через 1 секунду
+        Invoke("StopMoving", 1f);
     }
 
     [ContextMenu("Test Walk Down")]

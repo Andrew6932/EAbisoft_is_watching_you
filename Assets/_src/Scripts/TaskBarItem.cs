@@ -40,11 +40,11 @@ public class TaskBarItem : MonoBehaviour
         }
     }
 
-    // Запуск обратного отсчета
+
     public void StartCountdown(float seconds)
     {
         countdownTime = seconds;
-        originalText = "Consult with Manager"; // Сохраняем оригинальный текст
+        originalText = "Consult with Manager"; 
         isCountdownActive = true;
 
         if (countdownCoroutine != null)
@@ -54,7 +54,7 @@ public class TaskBarItem : MonoBehaviour
         countdownCoroutine = StartCoroutine(CountdownRoutine());
     }
 
-    // Остановка обратного отсчета
+
     public void StopCountdown()
     {
         isCountdownActive = false;
@@ -64,7 +64,7 @@ public class TaskBarItem : MonoBehaviour
             countdownCoroutine = null;
         }
 
-        // Возвращаем оригинальный текст без отсчета
+
         if (label != null && originalText != null)
         {
             label.text = originalText;
@@ -95,13 +95,12 @@ public class TaskBarItem : MonoBehaviour
             yield return null;
         }
 
-        // Когда время вышло - просто показываем 0 секунд
-        // ObjectHighlighter сам обработает удаление задачи
+
         if (isCountdownActive && countdownTime <= 0f)
         {
             label.text = $"{originalText} (0s)";
 
-            // Быстрое мигание в конце
+
             for (int i = 0; i < 4; i++)
             {
                 label.color = new Color(1f, 0f, 0f, 0.3f);
@@ -110,7 +109,7 @@ public class TaskBarItem : MonoBehaviour
                 yield return new WaitForSeconds(0.2f);
             }
 
-            // НЕ удаляем автоматически - ObjectHighlighter сделает это
+
         }
     }
 

@@ -118,16 +118,14 @@ public class MathPuzzle : MonoBehaviour
 
     void CreatePuzzleUI()
     {
-        // УДАЛИТЬ эту строку: if (puzzleContainer != null) return;
 
-        // Вместо этого - удаляем старый UI если есть
         if (puzzleContainer != null)
         {
             Destroy(puzzleContainer);
             puzzleContainer = null;
         }
 
-        // Находим существующий Canvas
+
         mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
         if (mainCanvas == null)
         {
@@ -136,11 +134,11 @@ public class MathPuzzle : MonoBehaviour
         }
 
         mainCanvas.sortingOrder = 10;
-        // Создаем контейнер внутри существующего Canvas
+
         puzzleContainer = CreateUIElement("MathPuzzleContainer", mainCanvas.transform);
         RectTransform containerRect = puzzleContainer.GetComponent<RectTransform>();
 
-        // Настраиваем контейнер - строго по центру экрана
+
         containerRect.anchorMin = new Vector2(0.5f, 0.5f);
         containerRect.anchorMax = new Vector2(0.5f, 0.5f);
         containerRect.pivot = new Vector2(0.5f, 0.5f);
@@ -148,7 +146,7 @@ public class MathPuzzle : MonoBehaviour
         containerRect.anchoredPosition = Vector2.zero;
         containerRect.localScale = Vector3.one;
 
-        // Добавляем фон для лучшей читаемости
+
         GameObject background = CreateUIElement("Background", puzzleContainer.transform);
         Image bgImage = background.AddComponent<Image>();
         bgImage.color = new Color(0, 0, 0, 0.85f);
@@ -159,7 +157,7 @@ public class MathPuzzle : MonoBehaviour
         bgRect.offsetMax = Vector2.zero;
         bgRect.localScale = Vector3.one;
 
-        // Уравнение - позиционируем относительно контейнера
+
         GameObject equationDisplay = CreateUIElement("Equation", puzzleContainer.transform);
         equationText = equationDisplay.AddComponent<TextMeshProUGUI>();
         equationText.text = mathEquation;
@@ -175,13 +173,13 @@ public class MathPuzzle : MonoBehaviour
         equationText.overflowMode = TextOverflowModes.Overflow;
 
         RectTransform equationRect = equationDisplay.GetComponent<RectTransform>();
-        equationRect.anchorMin = new Vector2(0f, 0.66f);  // Слева, 2/3 высоты
-        equationRect.anchorMax = new Vector2(1f, 0.9f);   // Справа, 90% высоты
-        equationRect.offsetMin = new Vector2(10f, 0f);    // Отступ слева
-        equationRect.offsetMax = new Vector2(-10f, 0f);   // Отступ справа
+        equationRect.anchorMin = new Vector2(0f, 0.66f);  
+        equationRect.anchorMax = new Vector2(1f, 0.9f);   
+        equationRect.offsetMin = new Vector2(10f, 0f);    
+        equationRect.offsetMax = new Vector2(-10f, 0f);   
         equationRect.localScale = Vector3.one;
 
-        // Ввод ответа - позиционируем относительно контейнера
+
         GameObject inputDisplay = CreateUIElement("Input", puzzleContainer.transform);
         inputText = inputDisplay.AddComponent<TextMeshProUGUI>();
 
@@ -197,13 +195,13 @@ public class MathPuzzle : MonoBehaviour
         inputText.text = "Ответ: _";
 
         RectTransform inputRect = inputDisplay.GetComponent<RectTransform>();
-        inputRect.anchorMin = new Vector2(0f, 0.33f); // Слева, 1/3 высоты
-        inputRect.anchorMax = new Vector2(1f, 0.66f); // Справа, 2/3 высоты
-        inputRect.offsetMin = new Vector2(10f, 0f);   // Отступ слева
-        inputRect.offsetMax = new Vector2(-10f, 0f);  // Отступ справа
+        inputRect.anchorMin = new Vector2(0f, 0.33f); 
+        inputRect.anchorMax = new Vector2(1f, 0.66f); 
+        inputRect.offsetMin = new Vector2(10f, 0f);   
+        inputRect.offsetMax = new Vector2(-10f, 0f); 
         inputRect.localScale = Vector3.one;
 
-        // Подсказка - позиционируем относительно контейнера
+
         GameObject hintDisplay = CreateUIElement("Hint", puzzleContainer.transform);
         hintText = hintDisplay.AddComponent<TextMeshProUGUI>();
         hintText.text = "Введите ответ и нажмите Enter (ESC - выход)";
@@ -217,14 +215,14 @@ public class MathPuzzle : MonoBehaviour
         hintText.enableAutoSizing = false;
 
         RectTransform hintRect = hintDisplay.GetComponent<RectTransform>();
-        hintRect.anchorMin = new Vector2(0f, 0f);     // Слева снизу
-        hintRect.anchorMax = new Vector2(1f, 0.33f);  // Справа, 1/3 высоты
-        hintRect.offsetMin = new Vector2(10f, 5f);    // Отступы
+        hintRect.anchorMin = new Vector2(0f, 0f);     
+        hintRect.anchorMax = new Vector2(1f, 0.33f); 
+        hintRect.offsetMin = new Vector2(10f, 5f);    
         hintRect.offsetMax = new Vector2(-10f, -5f);
         hintRect.localScale = Vector3.one;
 
         UpdateInputDisplay();
-        puzzleContainer.SetActive(true); // ИЗМЕНИТЬ на true чтобы сразу показывать
+        puzzleContainer.SetActive(true); 
     }
 
     void CreateNewCanvas()
@@ -235,7 +233,7 @@ public class MathPuzzle : MonoBehaviour
         canvasObj.AddComponent<CanvasScaler>();
         canvasObj.AddComponent<GraphicRaycaster>();
 
-        // Устанавливаем правильный sorting order
+
         mainCanvas.sortingOrder = 100;
     }
 
@@ -292,11 +290,11 @@ public class MathPuzzle : MonoBehaviour
         {
             if (string.IsNullOrEmpty(playerInput))
             {
-                inputText.text = "Ответ: _";
+                inputText.text = "Solution: _";
             }
             else
             {
-                inputText.text = "Ответ: " + playerInput;
+                inputText.text = "Solution: " + playerInput;
             }
         }
     }
@@ -310,7 +308,7 @@ public class MathPuzzle : MonoBehaviour
         {
             if (playerAnswer == correctAnswer)
             {
-                float progress = 50 + Random.Range(-7, 7);
+                float progress = 30 + Random.Range(-7, 7);
                 progressBar.addProgress(progress);
                 StartCoroutine(PuzzleComplete());
             }
@@ -333,7 +331,7 @@ public class MathPuzzle : MonoBehaviour
         if (inputText != null)
         {
             inputText.color = Color.green;
-            inputText.text = "✓ ВЕРНО! Ответ: " + correctAnswer;
+            inputText.text = "Nice!: " + correctAnswer;
         }
 
         yield return new WaitForSeconds(0.1f);
@@ -345,7 +343,7 @@ public class MathPuzzle : MonoBehaviour
 
         ClosePuzzle();
 
-        // Уведомляем ObjectHighlighter о завершении пазла
+
         if (highlighter != null)
         {
             highlighter.OnPuzzleCompleted();
@@ -357,16 +355,16 @@ public class MathPuzzle : MonoBehaviour
         if (inputText != null)
         {
             inputText.color = Color.red;
-            inputText.text = "✗ НЕВЕРНО! Ответ: " + correctAnswer;
+            inputText.text = "Fail!: " + correctAnswer;
         }
 
         yield return new WaitForSeconds(1.5f);
 
-        // Генерируем новую задачу при неудаче
+
         GenerateMathProblem();
         playerInput = "";
 
-        // Пересоздаем UI с новым примером
+
         CreatePuzzleUI();
         UpdateInputDisplay();
 
@@ -378,15 +376,15 @@ public class MathPuzzle : MonoBehaviour
 
     public void StartPuzzle()
     {
-        Debug.Log("Запуск математического пазла: " + gameObject.name);
 
-        // Генерируем новую задачу каждый раз при запуске
+
+
         GenerateMathProblem();
 
         isPuzzleActive = true;
         playerInput = "";
 
-        // Всегда создаем новый UI
+
         CreatePuzzleUI();
 
         SetPlayerControl(false);
@@ -401,14 +399,14 @@ public class MathPuzzle : MonoBehaviour
     {
         isPuzzleActive = false;
 
-        // Удаляем UI при закрытии
+
         if (puzzleContainer != null)
         {
             Destroy(puzzleContainer);
             puzzleContainer = null;
         }
 
-        // Восстанавливаем нормальный sorting order
+
         if (mainCanvas != null && mainCanvas.gameObject.name == "Canvas")
         {
             mainCanvas.sortingOrder = 0;
@@ -416,7 +414,7 @@ public class MathPuzzle : MonoBehaviour
 
         SetPlayerControl(true);
 
-        // Уведомляем ObjectHighlighter что пазл закрыт
+
         if (highlighter != null)
         {
             highlighter.OnPuzzleClosed();
@@ -432,7 +430,7 @@ public class MathPuzzle : MonoBehaviour
         }
     }
 
-    // Очистка при уничтожении
+
     void OnDestroy()
     {
         if (puzzleContainer != null)

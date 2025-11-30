@@ -459,6 +459,8 @@ MonoBehaviour:
   mathPuzzle: {fileID: 125111906}
   colorSequencePuzzle: {fileID: 0}
   taskBarMenu: {fileID: 934138708}
+  interactAudioClip: {fileID: 0}
+  puzzleCompleteAudioClip: {fileID: 0}
 --- !u!1 &130278306
 GameObject:
   m_ObjectHideFlags: 0
@@ -876,6 +878,7 @@ RectTransform:
   - {fileID: 2020071347}
   - {fileID: 1419476935}
   - {fileID: 934138703}
+  - {fileID: 653441490}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2191,6 +2194,8 @@ MonoBehaviour:
   mathPuzzle: {fileID: 0}
   colorSequencePuzzle: {fileID: 0}
   taskBarMenu: {fileID: 934138708}
+  interactAudioClip: {fileID: 8300000, guid: d70e049543fa867429a84c787c2e866f, type: 3}
+  puzzleCompleteAudioClip: {fileID: 0}
 --- !u!114 &548892931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2692,6 +2697,142 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &653441489
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 653441490}
+  - component: {fileID: 653441493}
+  - component: {fileID: 653441492}
+  - component: {fileID: 653441491}
+  - component: {fileID: 653441494}
+  m_Layer: 5
+  m_Name: SettingsButton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &653441490
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653441489}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 292273343}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 800, y: 495}
+  m_SizeDelta: {x: 160, y: 30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &653441491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653441489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 653441492}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &653441492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653441489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &653441493
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653441489}
+  m_CullTransparentMesh: 1
+--- !u!114 &653441494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653441489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4fa5f31049caae42984c94ac62a7e40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoSoundSettings
+  defaultMusicVolume: 0.5
+  defaultSFXVolume: 0.7
+  panelTitle: Sound Settings
 --- !u!1 &747706093
 GameObject:
   m_ObjectHideFlags: 0
@@ -19583,6 +19724,60 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 8.2, y: 4.6}
   m_EdgeRadius: 0
+--- !u!1 &1074606270
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1074606272}
+  - component: {fileID: 1074606271}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1074606271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074606270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71b635b64b1cdae44b96a6e1655653a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  backgroundMusic: {fileID: 8300000, guid: 094a6c99d880964458a6ea42d380e43d, type: 3}
+  musicVolume: 0.5
+  playMusicOnStart: 1
+  interactSound: {fileID: 0}
+  puzzleCompleteSound: {fileID: 8300000, guid: 454550aa75c41684191ea7aaf8fa2527, type: 3}
+  puzzleFailSound: {fileID: 8300000, guid: 0e1b9570c7ff380419192ad165c0c875, type: 3}
+  catMeowSound: {fileID: 0}
+  buttonClickSound: {fileID: 8300000, guid: 8aa73692cfa33ab4a932a701ed5ca074, type: 3}
+  musicSource: {fileID: 0}
+  sfxSource: {fileID: 0}
+--- !u!4 &1074606272
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074606270}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -5.03872, y: 4.02783, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1118701909
 GameObject:
   m_ObjectHideFlags: 0
@@ -22146,6 +22341,8 @@ MonoBehaviour:
   mathPuzzle: {fileID: 0}
   colorSequencePuzzle: {fileID: 0}
   taskBarMenu: {fileID: 934138708}
+  interactAudioClip: {fileID: 8300000, guid: 1a472a4d6915e284487e28b8122d4205, type: 3}
+  puzzleCompleteAudioClip: {fileID: 0}
 --- !u!114 &1294909592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22970,6 +23167,8 @@ MonoBehaviour:
   mathPuzzle: {fileID: 0}
   colorSequencePuzzle: {fileID: 1895718021}
   taskBarMenu: {fileID: 934138708}
+  interactAudioClip: {fileID: 0}
+  puzzleCompleteAudioClip: {fileID: 0}
 --- !u!61 &1895718023
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -23613,3 +23812,4 @@ SceneRoots:
   - {fileID: 1536972999}
   - {fileID: 1307369780}
   - {fileID: 747706098}
+  - {fileID: 1074606272}
