@@ -95,7 +95,8 @@ public class TaskBarItem : MonoBehaviour
             yield return null;
         }
 
-        // Если отсчет завершился сам (не был остановлен)
+        // Когда время вышло - просто показываем 0 секунд
+        // ObjectHighlighter сам обработает удаление задачи
         if (isCountdownActive && countdownTime <= 0f)
         {
             label.text = $"{originalText} (0s)";
@@ -109,11 +110,7 @@ public class TaskBarItem : MonoBehaviour
                 yield return new WaitForSeconds(0.2f);
             }
 
-            // Удаляем из таскбара только если отсчет не был остановлен
-            if (isCountdownActive)
-            {
-                RemoveFromTaskBar();
-            }
+            // НЕ удаляем автоматически - ObjectHighlighter сделает это
         }
     }
 

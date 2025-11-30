@@ -12,6 +12,8 @@ public class ObjectHighlighter : MonoBehaviour
     public float maxAlpha = 1f;
     public bool startHighlighted = false;
 
+    public GameManager gameManager;
+
     [Header("Interaction Prompt")]
     public string interactionText = "Нажми E чтобы взаимодействовать";
     public Vector3 textOffset = new Vector3(0, 2f, 0);
@@ -377,6 +379,12 @@ public class ObjectHighlighter : MonoBehaviour
         if (isManagerTaskActive && timeLeft <= 0f)
         {
             Debug.Log("Время на консультацию с менеджером вышло! Объект уходит на кулдаун.");
+
+            // Уведомляем GameManager о пропущенном звонке
+            if (gameManager != null)
+            {
+                gameManager.OnManagerCallMissed();
+            }
 
             // Убираем задачу из таскбара
             taskBarMenu.RemoveTaskBar("Consult with Manager");
