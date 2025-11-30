@@ -76,10 +76,15 @@ public class WaitTimePuzzle : MonoBehaviour
 
     void CreatePuzzleUI()
     {
-        if (puzzleContainer != null) return;
+        // Удаляем старый UI если есть
+        if (puzzleContainer != null)
+        {
+            Destroy(puzzleContainer);
+            puzzleContainer = null;
+        }
 
         // Находим существующий Canvas
-        Canvas mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
+        mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
         if (mainCanvas == null)
         {
             Debug.LogError("Canvas не найден на сцене!");
@@ -92,17 +97,17 @@ public class WaitTimePuzzle : MonoBehaviour
         puzzleContainer = CreateUIElement("WaitTimeContainer", mainCanvas.transform);
         RectTransform containerRect = puzzleContainer.GetComponent<RectTransform>();
 
-        // Настраиваем контейнер - строго по центру экрана
+        // Настраиваем контейнер - строго по центру экрана (исходные размеры)
         containerRect.anchorMin = new Vector2(0.5f, 0.5f);
         containerRect.anchorMax = new Vector2(0.5f, 0.5f);
         containerRect.pivot = new Vector2(0.5f, 0.5f);
-        containerRect.sizeDelta = new Vector2(400, 120);
+        containerRect.sizeDelta = new Vector2(400, 120); // Исходный размер
         containerRect.anchoredPosition = Vector2.zero;
         containerRect.localScale = Vector3.one;
 
         // Добавляем фон для лучшей читаемости
         GameObject background = CreateUIElement("Background", puzzleContainer.transform);
-        UnityEngine.UI.Image bgImage = background.AddComponent<UnityEngine.UI.Image>(); // Указал полный namespace
+        Image bgImage = background.AddComponent<Image>();
         bgImage.color = new Color(0, 0, 0, 0.85f);
         RectTransform bgRect = background.GetComponent<RectTransform>();
         bgRect.anchorMin = Vector2.zero;
@@ -118,7 +123,7 @@ public class WaitTimePuzzle : MonoBehaviour
         if (textFont != null)
             progressText.font = textFont;
 
-        progressText.fontSize = fontSize;
+        progressText.fontSize = fontSize; // Исходный размер шрифта
         progressText.color = progressColor;
         progressText.alignment = TextAlignmentOptions.Center;
         progressText.text = "Ожидание...";
@@ -139,7 +144,7 @@ public class WaitTimePuzzle : MonoBehaviour
 
             // Фон прогресс бара
             GameObject bgObj = CreateUIElement("Background", progressBarObj.transform);
-            UnityEngine.UI.Image bgImageBar = bgObj.AddComponent<UnityEngine.UI.Image>(); // Указал полный namespace
+            Image bgImageBar = bgObj.AddComponent<Image>();
             bgImageBar.color = new Color(0.3f, 0.3f, 0.3f, 0.7f);
 
             RectTransform bgRectBar = bgObj.GetComponent<RectTransform>();
@@ -151,10 +156,10 @@ public class WaitTimePuzzle : MonoBehaviour
 
             // Заполнение прогресс бара
             GameObject fillObj = CreateUIElement("Fill", progressBarObj.transform);
-            progressBar = fillObj.AddComponent<UnityEngine.UI.Image>(); // Указал полный namespace
+            progressBar = fillObj.AddComponent<Image>();
             progressBar.color = progressColor;
-            progressBar.type = UnityEngine.UI.Image.Type.Filled;
-            progressBar.fillMethod = UnityEngine.UI.Image.FillMethod.Horizontal;
+            progressBar.type = Image.Type.Filled;
+            progressBar.fillMethod = Image.FillMethod.Horizontal;
             progressBar.fillAmount = 0f;
 
             RectTransform fillRect = fillObj.GetComponent<RectTransform>();
@@ -174,13 +179,13 @@ public class WaitTimePuzzle : MonoBehaviour
 
         // Подсказка - позиционируем относительно контейнера
         GameObject hintDisplay = CreateUIElement("Hint", puzzleContainer.transform);
-        TextMeshProUGUI hintText = hintDisplay.AddComponent<TextMeshProUGUI>();
+        hintText = hintDisplay.AddComponent<TextMeshProUGUI>();
         hintText.text = "Стойте в зоне ожидания (ESC - выход)";
 
         if (textFont != null)
             hintText.font = textFont;
 
-        hintText.fontSize = fontSize - 4;
+        hintText.fontSize = fontSize - 4; // Исходный размер шрифта
         hintText.color = Color.gray;
         hintText.alignment = TextAlignmentOptions.Center;
         hintText.enableAutoSizing = false;
@@ -192,7 +197,7 @@ public class WaitTimePuzzle : MonoBehaviour
         hintRect.offsetMax = new Vector2(-10f, -5f);
         hintRect.localScale = Vector3.one;
 
-        puzzleContainer.SetActive(false);
+        puzzleContainer.SetActive(true); // Показываем сразу
     }
 
     GameObject CreateUIElement(string name, Transform parent)
@@ -211,7 +216,7 @@ public class WaitTimePuzzle : MonoBehaviour
         {
             float progress = currentWaitTime / waitTimeRequired;
             progressBar.fillAmount = progress;
-            progressText.text = $"Ожидание: {progress * 78:F0}%";
+            progressText.text = $"Ожидание: {progress * 100:F0}%"; // Исправлено с 78 на 100
         }
         else if (progressText != null)
         {
