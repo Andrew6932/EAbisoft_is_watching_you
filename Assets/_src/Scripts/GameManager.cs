@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour
         //System.Threading.Thread.Sleep(500);
 
         
-
+        StopCoroutine(gameLoopCoroutine);
         gameLoopCoroutine = StartCoroutine(startGameIteration());
 
 
@@ -124,6 +124,7 @@ public class GameManager : MonoBehaviour
 
                 gameCount++;
 
+                StopCoroutine(gameLoopCoroutine);
                 gameLoopCoroutine = StartCoroutine(startGameIteration());
             }
         }
