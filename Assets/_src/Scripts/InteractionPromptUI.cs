@@ -3,7 +3,7 @@
 public class InteractionPromptUI : MonoBehaviour
 {
     [Header("Text Appearance")]
-    public Color textColor = new Color(1, 0.9f, 0.2f); // Яркий желтый
+    public Color textColor = new Color(1, 0.9f, 0.2f); 
     public Color shadowColor = new Color(0, 0, 0, 0.7f);
     public int fontSize = 30;
     public float characterSize = 0.08f;
@@ -28,18 +28,16 @@ public class InteractionPromptUI : MonoBehaviour
     {
         basePosition = Vector3.zero;
 
-        // Создаем группу для текста
         textGroup = new GameObject("TextGroup");
         textGroup.transform.SetParent(transform);
         textGroup.transform.localPosition = basePosition;
 
-        // Создаем тень если включена
+
         if (enableShadow)
         {
             CreateShadowText(promptText);
         }
 
-        // Создаем основной текст
         CreateMainText(promptText);
 
         Hide();
@@ -85,14 +83,13 @@ public class InteractionPromptUI : MonoBehaviour
     {
         if (textGroup == null) return;
 
-        // Плавное плавающее движение
+
         if (enableFloat)
         {
             float floatY = Mathf.Sin(Time.time * pulseSpeed * 0.5f) * floatDistance;
             textGroup.transform.localPosition = basePosition + new Vector3(0, floatY, 0);
         }
 
-        // Пульсация масштаба
         if (enablePulse)
         {
             float pulseScale = 1f + Mathf.Sin(Time.time * pulseSpeed) * pulseIntensity;

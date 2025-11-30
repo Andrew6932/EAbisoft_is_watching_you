@@ -8,8 +8,8 @@ public class ColorSequencePuzzle : MonoBehaviour
 {
     [Header("Sequence Settings")]
     public int sequenceLength = 4;
-    public float showTime = 1f; // Время показа каждого цвета
-    public float delayBetweenColors = 0.5f; // Задержка между цветами
+    public float showTime = 1f; 
+    public float delayBetweenColors = 0.5f; 
 
     [Header("Colors")]
     public Color[] availableColors = new Color[]
@@ -72,14 +72,14 @@ public class ColorSequencePuzzle : MonoBehaviour
 
     void CreatePuzzleUI()
     {
-        // Удаляем старый UI если есть
+
         if (puzzleUI != null)
         {
             Destroy(puzzleUI);
             puzzleUI = null;
         }
 
-        // Находим существующий Canvas
+
         mainCanvas = GameObject.Find("Canvas")?.GetComponent<Canvas>();
         if (mainCanvas == null)
         {
@@ -89,19 +89,18 @@ public class ColorSequencePuzzle : MonoBehaviour
 
         mainCanvas.sortingOrder = 10;
 
-        // Создаем контейнер внутри существующего Canvas
+
         puzzleUI = CreateUIElement("ColorSequenceContainer", mainCanvas.transform);
         RectTransform containerRect = puzzleUI.GetComponent<RectTransform>();
 
-        // Настраиваем контейнер - строго по центру экрана (исходные размеры)
         containerRect.anchorMin = new Vector2(0.5f, 0.5f);
         containerRect.anchorMax = new Vector2(0.5f, 0.5f);
         containerRect.pivot = new Vector2(0.5f, 0.5f);
-        containerRect.sizeDelta = new Vector2(500, 300); // Исходный размер
+        containerRect.sizeDelta = new Vector2(500, 300); 
         containerRect.anchoredPosition = Vector2.zero;
         containerRect.localScale = Vector3.one;
 
-        // Добавляем фон для лучшей читаемости
+
         GameObject background = CreateUIElement("Background", puzzleUI.transform);
         Image bgImage = background.AddComponent<Image>();
         bgImage.color = new Color(0, 0, 0, 0.85f);
@@ -112,34 +111,34 @@ public class ColorSequencePuzzle : MonoBehaviour
         bgRect.offsetMax = Vector2.zero;
         bgRect.localScale = Vector3.one;
 
-        // Текст сообщения - позиционируем относительно контейнера
+ 
         GameObject messageDisplay = CreateUIElement("Message", puzzleUI.transform);
         messageText = messageDisplay.AddComponent<TextMeshProUGUI>();
 
         if (textFont != null)
             messageText.font = textFont;
 
-        messageText.fontSize = fontSize; // Исходный размер шрифта
+        messageText.fontSize = fontSize; 
         messageText.color = textColor;
         messageText.alignment = TextAlignmentOptions.Center;
         messageText.fontStyle = FontStyles.Bold;
-        messageText.text = "Запомните последовательность цветов!";
+        messageText.text = "Remember  Sequence!";
         messageText.enableAutoSizing = false;
         messageText.overflowMode = TextOverflowModes.Overflow;
 
         RectTransform messageRect = messageDisplay.GetComponent<RectTransform>();
-        messageRect.anchorMin = new Vector2(0f, 0.75f);   // Слева, 3/4 высоты
-        messageRect.anchorMax = new Vector2(1f, 0.95f);   // Справа, 95% высоты
-        messageRect.offsetMin = new Vector2(10f, 0f);     // Отступ слева
-        messageRect.offsetMax = new Vector2(-10f, 0f);    // Отступ справа
+        messageRect.anchorMin = new Vector2(0f, 0.75f);   
+        messageRect.anchorMax = new Vector2(1f, 0.95f);   
+        messageRect.offsetMin = new Vector2(10f, 0f);     
+        messageRect.offsetMax = new Vector2(-10f, 0f);    
         messageRect.localScale = Vector3.one;
 
-        // Контейнер для кнопок цветов - позиционируем относительно контейнера
+
         GameObject buttonsContainer = CreateUIElement("ButtonsContainer", puzzleUI.transform);
         RectTransform buttonsRect = buttonsContainer.GetComponent<RectTransform>();
-        buttonsRect.anchorMin = new Vector2(0f, 0.3f);    // Слева, 30% высоты
-        buttonsRect.anchorMax = new Vector2(1f, 0.75f);   // Справа, 75% высоты
-        buttonsRect.offsetMin = new Vector2(20f, 10f);    // Отступы
+        buttonsRect.anchorMin = new Vector2(0f, 0.3f);    
+        buttonsRect.anchorMax = new Vector2(1f, 0.75f);  
+        buttonsRect.offsetMin = new Vector2(20f, 10f);    
         buttonsRect.offsetMax = new Vector2(-20f, -10f);
         buttonsRect.localScale = Vector3.one;
 
@@ -147,14 +146,14 @@ public class ColorSequencePuzzle : MonoBehaviour
         colorButtons = new GameObject[availableColors.Length];
         colorButtonImages = new Image[availableColors.Length];
 
-        float buttonSize = 70f; // Исходный размер кнопок
-        float spacing = 15f;    // Исходный отступ
+        float buttonSize = 70f; 
+        float spacing = 15f;    
         float totalWidth = (availableColors.Length * buttonSize) + ((availableColors.Length - 1) * spacing);
         float startX = -totalWidth / 2 + buttonSize / 2;
 
         for (int i = 0; i < availableColors.Length; i++)
         {
-            // Создаем кнопку
+
             GameObject buttonObj = CreateUIElement("ColorButton_" + i, buttonsContainer.transform);
             buttonObj.AddComponent<RectTransform>();
             buttonObj.AddComponent<CanvasRenderer>();
@@ -163,10 +162,10 @@ public class ColorSequencePuzzle : MonoBehaviour
             buttonImage.color = availableColors[i];
             buttonImage.type = Image.Type.Sliced;
 
-            // Добавляем кнопку UI
+
             Button button = buttonObj.AddComponent<Button>();
 
-            // Настраиваем цвета кнопки
+
             ColorBlock colors = button.colors;
             colors.normalColor = availableColors[i];
             colors.highlightedColor = Color.Lerp(availableColors[i], Color.white, 0.3f);
@@ -175,16 +174,15 @@ public class ColorSequencePuzzle : MonoBehaviour
             colors.disabledColor = Color.Lerp(availableColors[i], Color.gray, 0.7f);
             button.colors = colors;
 
-            int colorIndex = i; // Важно для замыкания
+            int colorIndex = i; 
             button.onClick.AddListener(() => OnColorButtonClick(colorIndex));
 
-            // НАСТРОЙКА ПОЗИЦИОНИРОВАНИЯ
             RectTransform buttonRect = buttonObj.GetComponent<RectTransform>();
-            buttonRect.anchorMin = new Vector2(0.5f, 0.5f);  // Центр по X и Y
-            buttonRect.anchorMax = new Vector2(0.5f, 0.5f);  // Центр по X и Y
-            buttonRect.pivot = new Vector2(0.5f, 0.5f);      // Центр как точка привязки
+            buttonRect.anchorMin = new Vector2(0.5f, 0.5f);  
+            buttonRect.anchorMax = new Vector2(0.5f, 0.5f); 
+            buttonRect.pivot = new Vector2(0.5f, 0.5f);      
             buttonRect.sizeDelta = new Vector2(buttonSize, buttonSize);
-            // Позиционируем относительно центра контейнера
+
             buttonRect.anchoredPosition = new Vector2(startX + i * (buttonSize + spacing), 0);
             buttonRect.localScale = Vector3.one;
 
@@ -192,27 +190,27 @@ public class ColorSequencePuzzle : MonoBehaviour
             colorButtonImages[i] = buttonImage;
         }
 
-        // Подсказка - позиционируем относительно контейнера
+
         GameObject hintDisplay = CreateUIElement("Hint", puzzleUI.transform);
         TextMeshProUGUI hintText = hintDisplay.AddComponent<TextMeshProUGUI>();
-        hintText.text = "Повторите последовательность цветов (ESC - выход)";
+        hintText.text = "Repeat Sequence  (ESC - exit)";
 
         if (textFont != null)
             hintText.font = textFont;
 
-        hintText.fontSize = fontSize - 4; // Исходный размер шрифта
+        hintText.fontSize = fontSize - 4; 
         hintText.color = Color.gray;
         hintText.alignment = TextAlignmentOptions.Center;
         hintText.enableAutoSizing = false;
 
         RectTransform hintRect = hintDisplay.GetComponent<RectTransform>();
-        hintRect.anchorMin = new Vector2(0f, 0f);     // Слева снизу
-        hintRect.anchorMax = new Vector2(1f, 0.3f);   // Справа, 30% высоты
-        hintRect.offsetMin = new Vector2(10f, 5f);    // Отступы
+        hintRect.anchorMin = new Vector2(0f, 0f);     
+        hintRect.anchorMax = new Vector2(1f, 0.3f);   
+        hintRect.offsetMin = new Vector2(10f, 5f);    
         hintRect.offsetMax = new Vector2(-10f, -5f);
         hintRect.localScale = Vector3.one;
 
-        puzzleUI.SetActive(true); // Показываем сразу
+        puzzleUI.SetActive(true); 
     }
 
     GameObject CreateUIElement(string name, Transform parent)
@@ -230,21 +228,21 @@ public class ColorSequencePuzzle : MonoBehaviour
         playerSequence.Add(colorIndex);
         StartCoroutine(HighlightButton(colorIndex));
 
-        // Проверяем правильность после каждого нажатия
+
         CheckSequence();
     }
 
     IEnumerator HighlightButton(int colorIndex)
     {
         Color originalColor = colorButtonImages[colorIndex].color;
-        colorButtonImages[colorIndex].color = Color.white; // Подсветка
+        colorButtonImages[colorIndex].color = Color.white; 
         yield return new WaitForSeconds(0.3f);
         colorButtonImages[colorIndex].color = originalColor;
     }
 
     void CheckSequence()
     {
-        // Проверяем текущую последовательность
+
         for (int i = 0; i < playerSequence.Count; i++)
         {
             if (playerSequence[i] != correctSequence[i])
@@ -255,17 +253,17 @@ public class ColorSequencePuzzle : MonoBehaviour
             }
         }
 
-        // Если последовательность полная и правильная
+
         if (playerSequence.Count == correctSequence.Count)
         {
             StartCoroutine(PuzzleComplete());
         }
         else
         {
-            // Обновляем сообщение
+
             if (messageText != null)
             {
-                messageText.text = $"Правильно! Осталось: {correctSequence.Count - playerSequence.Count}";
+                messageText.text = $"Correct! : {correctSequence.Count - playerSequence.Count}";
                 messageText.color = Color.green;
             }
         }
@@ -277,37 +275,36 @@ public class ColorSequencePuzzle : MonoBehaviour
 
         if (messageText != null)
         {
-            messageText.text = "Запоминайте последовательность...";
+            messageText.text = "Remember Sequence .";
             messageText.color = Color.yellow;
         }
 
-        // Блокируем кнопки на время показа
         SetButtonsInteractable(false);
 
         yield return new WaitForSeconds(1f);
 
-        // Показываем последовательность
+
         for (int i = 0; i < correctSequence.Count; i++)
         {
             int colorIndex = correctSequence[i];
             Color originalColor = colorButtonImages[colorIndex].color;
 
-            // Подсвечиваем кнопку
+
             colorButtonImages[colorIndex].color = Color.white;
             yield return new WaitForSeconds(showTime);
 
-            // Возвращаем оригинальный цвет
+
             colorButtonImages[colorIndex].color = originalColor;
             yield return new WaitForSeconds(delayBetweenColors);
         }
 
-        // Включаем кнопки для игрока
+
         SetButtonsInteractable(true);
         isShowingSequence = false;
 
         if (messageText != null)
         {
-            messageText.text = "Повторите последовательность!";
+            messageText.text = "Repeat Sequence!";
             messageText.color = Color.white;
         }
     }
@@ -351,7 +348,6 @@ public class ColorSequencePuzzle : MonoBehaviour
 
         ClosePuzzle();
 
-        // Уведомляем ObjectHighlighter о завершении пазла
         if (highlighter != null)
         {
             
@@ -382,7 +378,7 @@ public class ColorSequencePuzzle : MonoBehaviour
     {
         if (messageText != null)
         {
-            messageText.text = "✗ ОШИБКА! Попробуйте снова";
+            messageText.text = "Fail! try again";
             messageText.color = Color.red;
         }
 
@@ -401,9 +397,9 @@ public class ColorSequencePuzzle : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        // Перезапускаем пазл с новой последовательностью
+
         playerSequence.Clear();
-        GenerateSequence(); // Генерируем новую последовательность
+        GenerateSequence(); 
         StartCoroutine(ShowSequence());
 
         if (onPuzzleFail != null)
@@ -440,10 +436,10 @@ public class ColorSequencePuzzle : MonoBehaviour
         if (puzzleUI != null)
         {
             puzzleUI.SetActive(false);
-            // Не удаляем полностью, чтобы можно было переиспользовать при ошибках
+            
         }
 
-        // Восстанавливаем нормальный sorting order при закрытии пазла
+
         if (mainCanvas != null)
         {
             mainCanvas.sortingOrder = 0;
@@ -451,7 +447,7 @@ public class ColorSequencePuzzle : MonoBehaviour
 
         SetPlayerControl(true);
 
-        // Уведомляем ObjectHighlighter что пазл закрыт
+
         if (highlighter != null)
         {
             highlighter.OnPuzzleClosed();
@@ -467,7 +463,7 @@ public class ColorSequencePuzzle : MonoBehaviour
         }
     }
 
-    // Очистка при уничтожении
+
     void OnDestroy()
     {
         if (puzzleUI != null)
@@ -476,7 +472,7 @@ public class ColorSequencePuzzle : MonoBehaviour
         }
     }
 
-    // Методы для настройки из других скриптов
+
     public void SetSequenceLength(int length)
     {
         sequenceLength = Mathf.Clamp(length, 2, 8);
@@ -493,7 +489,7 @@ public class ColorSequencePuzzle : MonoBehaviour
         if (newColors != null && newColors.Length > 0)
         {
             availableColors = newColors;
-            // Пересоздаем UI если он активен
+
             if (isPuzzleActive && puzzleUI != null)
             {
                 CreatePuzzleUI();

@@ -15,7 +15,7 @@ public class ObjectHighlighter : MonoBehaviour
     public GameManager gameManager;
 
     [Header("Interaction Prompt")]
-    public string interactionText = "Нажми E чтобы взаимодействовать";
+    public string interactionText = "Click E";
     public Vector3 textOffset = new Vector3(0, 2f, 0);
 
     [Header("Cooldown Settings")]
@@ -25,7 +25,7 @@ public class ObjectHighlighter : MonoBehaviour
     public Color cooldownColor = Color.gray;
 
     [Header("Task Manager Settings")]
-    public float managerTaskDuration = 10f; // Время на выполнение задачи менеджера
+    public float managerTaskDuration = 10f; 
 
     [Header("Puzzle Settings")]
     public SimpleCodePuzzle codePuzzle;
@@ -44,6 +44,10 @@ public class ObjectHighlighter : MonoBehaviour
     private bool isManagerTaskActive = false;
     public TaskBarMenu taskBarMenu;
 
+    [Header("Audio")]
+    public AudioClip interactAudioClip;
+    public AudioClip puzzleCompleteAudioClip;
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -54,7 +58,6 @@ public class ObjectHighlighter : MonoBehaviour
 
         CreatePromptUI();
 
-        // Особые настройки для таск менеджера
         if (IsTaskManager())
         {
             ConfigureTaskManager();
@@ -69,7 +72,6 @@ public class ObjectHighlighter : MonoBehaviour
             StopHighlight();
         }
 
-        // Добавляем задачи в таскбар для всех объектов КРОМЕ таск менеджера
         switch (gameObject.name)
         {
             case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
@@ -81,36 +83,35 @@ public class ObjectHighlighter : MonoBehaviour
             case "Modern_Office_MV_2_TILESETS_B-C-D-E_45":
                 taskBarMenu.AddNewTaskBar("Program Game");
                 break;
-            // Таск менеджер НЕ добавляется изначально - он появится после кулдауна
             default:
                 break;
         }
     }
 
-    // Проверяем, является ли этот объект таск менеджером
+
     private bool IsTaskManager()
     {
         return gameObject.name == "Modern_Office_MV_2_TILESETS_B-C-D-E_36";
     }
 
-    // Настраиваем таск менеджер с особыми параметрами
+
     private void ConfigureTaskManager()
     {
-        // Устанавливаем красный цвет подсветки
+
         highlightColor = Color.red;
 
-        // Устанавливаем случайный кулдаун от 15 до 40 секунд
+
         interactionCooldown = Random.Range(15f, 40f);
 
-        // Включаем кулдаун сразу при старте
+
         StartCooldown();
 
-        Debug.Log($"Таск менеджер настроен: кулдаун {interactionCooldown:F1} секунд, цвет: красный");
+
     }
 
     void Update()
     {
-        // Пульсация подсветки только если объект включен и не на кулдауне
+
         if (isHighlighted && spriteRenderer != null && highlightEnabled && !isOnCooldown)
         {
             float alpha = Mathf.Lerp(minAlpha, maxAlpha, (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f);
@@ -119,12 +120,11 @@ public class ObjectHighlighter : MonoBehaviour
             spriteRenderer.color = pulseColor;
         }
 
-        // Обработка кулдауна
+
         if (isOnCooldown)
         {
             cooldownTimer -= Time.deltaTime;
 
-            // Визуальная индикация кулдауна
             if (showCooldownVisual && spriteRenderer != null)
             {
                 float cooldownProgress = cooldownTimer / interactionCooldown;
@@ -133,7 +133,7 @@ public class ObjectHighlighter : MonoBehaviour
                 spriteRenderer.color = currentColor;
             }
 
-            // Обновляем текст подсказки если включено
+
             if (showCooldownText && promptUI != null && playerInRange)
             {
                 UpdateCooldownText();
@@ -145,7 +145,7 @@ public class ObjectHighlighter : MonoBehaviour
             }
         }
 
-        // Взаимодействие только если объект включен, игрок в зоне и нет кулдауна
+
         if (playerInRange && Input.GetKeyDown(KeyCode.E) && highlightEnabled && !isOnCooldown)
         {
             OnInteract();
@@ -154,7 +154,7 @@ public class ObjectHighlighter : MonoBehaviour
 
     void CreatePromptUI()
     {
-        // Удаляем старый UI если есть
+
         if (promptUI != null)
         {
             Destroy(promptUI.gameObject);
@@ -166,7 +166,7 @@ public class ObjectHighlighter : MonoBehaviour
 
         promptUI = promptObj.AddComponent<InteractionPromptUI>();
 
-        // Для таск менеджера обновляем текст с учетом красной подсветки
+
         if (IsTaskManager())
         {
             promptUI.Setup("Consult with Manager (Red Priority)");
@@ -185,7 +185,6 @@ public class ObjectHighlighter : MonoBehaviour
 
         isHighlighted = true;
 
-        // Восстанавливаем нормальную подсветку если не на кулдауне
         if (!isOnCooldown && spriteRenderer != null)
         {
             float alpha = Mathf.Lerp(minAlpha, maxAlpha, (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f);
@@ -194,7 +193,7 @@ public class ObjectHighlighter : MonoBehaviour
             spriteRenderer.color = pulseColor;
         }
 
-        // Показываем подсказку если игрок в зоне
+
         if (playerInRange && promptUI != null)
         {
             if (isOnCooldown && showCooldownText)
@@ -203,7 +202,7 @@ public class ObjectHighlighter : MonoBehaviour
             }
             else
             {
-                // Для таск менеджера используем специальный текст
+
                 if (IsTaskManager())
                 {
                     promptUI.UpdateText("Consult with Manager (Red Priority)");
@@ -245,7 +244,6 @@ public class ObjectHighlighter : MonoBehaviour
                 }
                 else
                 {
-                    // Для таск менеджера используем специальный текст
                     if (IsTaskManager())
                     {
                         promptUI.UpdateText("Consult with Manager (Red Priority)");
@@ -272,18 +270,26 @@ public class ObjectHighlighter : MonoBehaviour
     {
         if (!highlightEnabled || isOnCooldown) return;
 
-        Debug.Log("Взаимодействие с: " + gameObject.name);
+        if (interactAudioClip != null)
+        {
+            AudioManager.Instance.PlaySound(interactAudioClip);
+        }
+        else
+        {
+            AudioManager.Instance.PlayInteractSound(); 
+        }
+       
 
-        // Если это менеджер и активна задача с обратным отсчетом, останавливаем ее
+
         if (IsTaskManager() && isManagerTaskActive)
         {
             StopManagerTask();
 
-            // Убираем задачу из таскбара при начале взаимодействия
+
             taskBarMenu.RemoveTaskBar("Consult with Manager");
         }
 
-        // Запускаем соответствующий пазл
+
         if (codePuzzle != null)
         {
             codePuzzle.StartPuzzle();
@@ -307,7 +313,7 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
-    // ЗАПУСК задачи менеджера с обратным отсчетом
+
     private void StartManagerTask()
     {
         if (managerTaskCoroutine != null)
@@ -318,7 +324,7 @@ public class ObjectHighlighter : MonoBehaviour
         managerTaskCoroutine = StartCoroutine(ManagerTaskCountdown());
     }
 
-    // Остановка задачи менеджера (при успешном взаимодействии)
+
     private void StopManagerTask()
     {
         if (managerTaskCoroutine != null)
@@ -328,7 +334,7 @@ public class ObjectHighlighter : MonoBehaviour
         }
         isManagerTaskActive = false;
 
-        // Останавливаем обратный отсчет в таскбаре
+
         TaskBarItem currentManagerTask = FindCurrentManagerTask();
         if (currentManagerTask != null)
         {
@@ -336,10 +342,10 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
-    // Находим текущую задачу менеджера в таскбаре
+
     private TaskBarItem FindCurrentManagerTask()
     {
-        // Вариант 1: если TaskBarMenu хранит список items
+
         if (taskBarMenu != null)
         {
             foreach (var item in taskBarMenu.GetItems())
@@ -351,7 +357,7 @@ public class ObjectHighlighter : MonoBehaviour
             }
         }
 
-        // Вариант 2: найти через поиск по сцене
+
         TaskBarItem[] allItems = FindObjectsOfType<TaskBarItem>();
         foreach (var item in allItems)
         {
@@ -364,7 +370,6 @@ public class ObjectHighlighter : MonoBehaviour
         return null;
     }
 
-    // Обратный отсчет для задачи менеджера
     private IEnumerator ManagerTaskCountdown()
     {
         float timeLeft = managerTaskDuration;
@@ -375,21 +380,21 @@ public class ObjectHighlighter : MonoBehaviour
             yield return null;
         }
 
-        // Если время вышло и задача все еще активна (не было взаимодействия)
+
         if (isManagerTaskActive && timeLeft <= 0f)
         {
-            Debug.Log("Время на консультацию с менеджером вышло! Объект уходит на кулдаун.");
 
-            // Уведомляем GameManager о пропущенном звонке
+
+
             if (gameManager != null)
             {
                 gameManager.OnManagerCallMissed();
             }
 
-            // Убираем задачу из таскбара
+
             taskBarMenu.RemoveTaskBar("Consult with Manager");
 
-            // Запускаем кулдаун
+
             StartCooldown();
 
             isManagerTaskActive = false;
@@ -401,19 +406,19 @@ public class ObjectHighlighter : MonoBehaviour
         isOnCooldown = true;
         cooldownTimer = interactionCooldown;
 
-        // Останавливаем задачу менеджера если она активна
+
         if (isManagerTaskActive)
         {
             StopManagerTask();
         }
 
-        // Скрываем подсказку взаимодействия
+
         if (promptUI != null)
         {
             promptUI.Hide();
         }
 
-        // Убираем задачу из таскбара при начале кулдауна
+
         switch (gameObject.name)
         {
             case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
@@ -432,7 +437,7 @@ public class ObjectHighlighter : MonoBehaviour
                 break;
         }
 
-        Debug.Log("Начат кулдаун для: " + gameObject.name);
+
     }
 
     void EndCooldown()
@@ -440,7 +445,7 @@ public class ObjectHighlighter : MonoBehaviour
         isOnCooldown = false;
         cooldownTimer = 0f;
 
-        // Восстанавливаем нормальную подсветку
+
         if (isHighlighted && spriteRenderer != null)
         {
             float alpha = Mathf.Lerp(minAlpha, maxAlpha, (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f);
@@ -449,18 +454,18 @@ public class ObjectHighlighter : MonoBehaviour
             spriteRenderer.color = pulseColor;
         }
 
-        // Для таск менеджера запускаем задачу с обратным отсчетом
+
         if (IsTaskManager())
         {
-            // Добавляем задачу в таскбар
+
             taskBarMenu.AddNewTaskBar("Consult with Manager");
 
-            // Запускаем обратный отсчет для задачи
-            StartManagerTask(); // ВОТ ТЕПЕРЬ ЭТОТ МЕТОД СУЩЕСТВУЕТ
+
+            StartManagerTask();
         }
         else
         {
-            // Для других объектов просто добавляем задачу
+
             switch (gameObject.name)
             {
                 case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
@@ -477,10 +482,10 @@ public class ObjectHighlighter : MonoBehaviour
             }
         }
 
-        // Показываем подсказку снова если игрок в зоне
+
         if (playerInRange && promptUI != null)
         {
-            // Для таск менеджера используем специальный текст
+
             if (IsTaskManager())
             {
                 promptUI.UpdateText("Consult with Manager (Red Priority)");
@@ -492,7 +497,7 @@ public class ObjectHighlighter : MonoBehaviour
             promptUI.Show();
         }
 
-        Debug.Log("Кулдаун завершен для: " + gameObject.name);
+
     }
 
     void UpdateCooldownText()
@@ -500,12 +505,12 @@ public class ObjectHighlighter : MonoBehaviour
         if (promptUI != null && isOnCooldown && playerInRange)
         {
             int secondsLeft = Mathf.CeilToInt(cooldownTimer);
-            promptUI.UpdateText($"Перезарядка: {secondsLeft}с");
+            promptUI.UpdateText($"cooldown: {secondsLeft}с");
             promptUI.Show();
         }
     }
 
-    // Метод для принудительного обновления настроек таск менеджера
+
     public void RefreshTaskManagerSettings()
     {
         if (IsTaskManager())
@@ -513,11 +518,6 @@ public class ObjectHighlighter : MonoBehaviour
             ConfigureTaskManager();
         }
     }
-    // Методы для управления из инспектора и других скриптов
-
-    /// <summary>
-    /// Включить объект (подсветку и взаимодействие)
-    /// </summary>
     public void EnableObject()
     {
         highlightEnabled = true;
@@ -527,18 +527,14 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Выключить объект (подсветку и взаимодействие)
-    /// </summary>
+
     public void DisableObject()
     {
         highlightEnabled = false;
         StopHighlight();
     }
 
-    /// <summary>
-    /// Переключить состояние объекта
-    /// </summary>
+
     public void ToggleObject()
     {
         highlightEnabled = !highlightEnabled;
@@ -552,9 +548,7 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Временно отключить объект на указанное время
-    /// </summary>
+
     public void DisableTemporarily(float seconds)
     {
         StartCoroutine(DisableForSeconds(seconds));
@@ -573,17 +567,12 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Сбросить кулдаун и восстановить подсветку
-    /// </summary>
     public void ResetCooldown()
     {
         EndCooldown();
     }
 
-    /// <summary>
-    /// Установить новый кулдаун
-    /// </summary>
+
     public void SetCooldown(float newCooldown)
     {
         interactionCooldown = newCooldown;
@@ -593,9 +582,7 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Принудительно начать кулдаун
-    /// </summary>
+
     public void ForceCooldown(float customCooldown = -1f)
     {
         if (customCooldown > 0f)
@@ -605,15 +592,13 @@ public class ObjectHighlighter : MonoBehaviour
         StartCooldown();
     }
 
-    /// <summary>
-    /// Пересоздать UI (полезно после кулдауна)
-    /// </summary>
+
     public void RefreshUI()
     {
         CreatePromptUI();
         if (isHighlighted && playerInRange && !isOnCooldown)
         {
-            // Для таск менеджера используем специальный текст
+
             if (IsTaskManager())
             {
                 promptUI.UpdateText("Consult with Manager (Red Priority)");
@@ -640,7 +625,7 @@ public class ObjectHighlighter : MonoBehaviour
         return playerInRange;
     }
 
-    // Свойства для проверки состояния
+
     public bool IsEnabled
     {
         get { return highlightEnabled; }
@@ -661,9 +646,7 @@ public class ObjectHighlighter : MonoBehaviour
         get { return isOnCooldown ? cooldownTimer : 0f; }
     }
 
-    /// <summary>
-    /// Получить информацию о состоянии для отладки
-    /// </summary>
+ 
     public string GetStatusInfo()
     {
         return $"Object: {gameObject.name}\n" +
@@ -675,15 +658,23 @@ public class ObjectHighlighter : MonoBehaviour
                $"Cooldown progress: {CooldownProgress:P0}";
     }
 
-    // Вызывается когда пазл завершается (должен вызываться из пазла)
+
     public void OnPuzzleCompleted()
     {
+        if (puzzleCompleteAudioClip != null)
+        {
+            AudioManager.Instance.PlaySound(puzzleCompleteAudioClip);
+        }
+        else
+        {
+            AudioManager.Instance.PlayPuzzleCompleteSound();
+        }
         StartCooldown();
     }
 
-    // Вызывается когда пазл закрывается без завершения
+
     public void OnPuzzleClosed()
     {
-        // Ничего не делаем, подсветка восстановится после кулдауна
+
     }
 }

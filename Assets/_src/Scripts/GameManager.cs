@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     public TimeBar timeBar;
     public GameCompletionBar gameCompletionBar;
     bool gameRelease;
-    int missedManagerCalls = 0; // Счетчик пропущенных звонков менеджера
+    int missedManagerCalls = 0; 
 
     private void Start()
     {
@@ -31,12 +31,10 @@ public class GameManager : MonoBehaviour
     public void OnManagerCallMissed()
     {
         missedManagerCalls++;
-        Debug.Log($"Пропущен звонок менеджера! Всего пропущено: {missedManagerCalls}");
 
 
         if (missedManagerCalls >= 2)
         {
-            Debug.Log("Пропущено 2 звонка менеджера! Время сбрасывается!");
 
             lostGame();
             missedManagerCalls = 0;
@@ -47,7 +45,6 @@ public class GameManager : MonoBehaviour
             float currentProgress = gameCompletionBar.getProgress();
             float newProgress = Mathf.Max(0f, currentProgress - 0.05f);
             gameCompletionBar.setProgress(newProgress, 20f);
-            Debug.Log($"Прогресс уменьшен на 5%. Текущий прогресс: {newProgress:P0}");
         }
     }
 
