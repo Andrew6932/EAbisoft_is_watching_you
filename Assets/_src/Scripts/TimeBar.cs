@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -50,11 +51,31 @@ public class TimeBar : MonoBehaviour
             AnimationCoroutine = StartCoroutine(AnimateProgress(progress, speed));
         }
     }
+    public float getProgress()
+    {
+        if(ProgressImage.fillAmount < 0)
+        {
+            return 0f;
+        }else if(ProgressImage.fillAmount > 1)
+        {
+            return 1f;
+        }
+        return ProgressImage.fillAmount;
+    }
 
     private IEnumerator AnimateProgress(float progress, float speed){
         float time = 0;
         float initalProgress = ProgressImage.fillAmount;
 
+        if(Mathf.Approximately(progress, 0f))
+        {
+            isEmpty = true;
+        }
+        else
+        {
+            isEmpty = false;
+        }
+        
         while(time < 1){
             ProgressImage.fillAmount = Mathf.Lerp(initalProgress, progress, time);
             time += Time.deltaTime * speed;
@@ -68,5 +89,18 @@ public class TimeBar : MonoBehaviour
         if(Mathf.Approximately(progress, 0f)){
             isEmpty = true;
         }
+    }
+
+    public void setInstantProgressToOne()
+    {
+        if(AnimationCoroutine != null)
+        {
+            StopCoroutine(AnimationCoroutine);
+            AnimationCoroutine = null;
+        }
+
+        ProgressImage.fillAmount = 1;
+        isEmpty = false;
+        OnProgress?.Invoke(1);
     }
 }
