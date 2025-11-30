@@ -25,7 +25,7 @@ public class ObjectHighlighter : MonoBehaviour
     public Color cooldownColor = Color.gray;
 
     [Header("Task Manager Settings")]
-    public float managerTaskDuration = 10f; 
+    public float managerTaskDuration = 10f;
 
     [Header("Puzzle Settings")]
     public SimpleCodePuzzle codePuzzle;
@@ -88,30 +88,20 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
-
     private bool IsTaskManager()
     {
         return gameObject.name == "Modern_Office_MV_2_TILESETS_B-C-D-E_36";
     }
 
-
     private void ConfigureTaskManager()
     {
-
         highlightColor = Color.red;
-
-
         interactionCooldown = Random.Range(15f, 40f);
-
-
         StartCooldown();
-
-
     }
 
     void Update()
     {
-
         if (isHighlighted && spriteRenderer != null && highlightEnabled && !isOnCooldown)
         {
             float alpha = Mathf.Lerp(minAlpha, maxAlpha, (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f);
@@ -119,7 +109,6 @@ public class ObjectHighlighter : MonoBehaviour
             pulseColor.a = alpha;
             spriteRenderer.color = pulseColor;
         }
-
 
         if (isOnCooldown)
         {
@@ -133,7 +122,6 @@ public class ObjectHighlighter : MonoBehaviour
                 spriteRenderer.color = currentColor;
             }
 
-
             if (showCooldownText && promptUI != null && playerInRange)
             {
                 UpdateCooldownText();
@@ -145,7 +133,6 @@ public class ObjectHighlighter : MonoBehaviour
             }
         }
 
-
         if (playerInRange && Input.GetKeyDown(KeyCode.E) && highlightEnabled && !isOnCooldown)
         {
             OnInteract();
@@ -154,7 +141,6 @@ public class ObjectHighlighter : MonoBehaviour
 
     void CreatePromptUI()
     {
-
         if (promptUI != null)
         {
             Destroy(promptUI.gameObject);
@@ -165,7 +151,6 @@ public class ObjectHighlighter : MonoBehaviour
         promptObj.transform.localPosition = textOffset;
 
         promptUI = promptObj.AddComponent<InteractionPromptUI>();
-
 
         if (IsTaskManager())
         {
@@ -193,7 +178,6 @@ public class ObjectHighlighter : MonoBehaviour
             spriteRenderer.color = pulseColor;
         }
 
-
         if (playerInRange && promptUI != null)
         {
             if (isOnCooldown && showCooldownText)
@@ -202,7 +186,6 @@ public class ObjectHighlighter : MonoBehaviour
             }
             else
             {
-
                 if (IsTaskManager())
                 {
                     promptUI.UpdateText("Consult with Manager (Red Priority)");
@@ -276,19 +259,19 @@ public class ObjectHighlighter : MonoBehaviour
         }
         else
         {
-            AudioManager.Instance.PlayInteractSound(); 
+            AudioManager.Instance.PlayInteractSound();
         }
-       
 
-
-        if (IsTaskManager() && isManagerTaskActive)
+        if (IsTaskManager())
         {
-            StopManagerTask();
+            AudioManager.Instance.StopPhoneRing();
 
-
-            taskBarMenu.RemoveTaskBar("Consult with Manager");
+            if (isManagerTaskActive)
+            {
+                StopManagerTask();
+                taskBarMenu.RemoveTaskBar("Consult with Manager");
+            }
         }
-
 
         if (codePuzzle != null)
         {
@@ -313,7 +296,6 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
-
     private void StartManagerTask()
     {
         if (managerTaskCoroutine != null)
@@ -324,7 +306,6 @@ public class ObjectHighlighter : MonoBehaviour
         managerTaskCoroutine = StartCoroutine(ManagerTaskCountdown());
     }
 
-
     private void StopManagerTask()
     {
         if (managerTaskCoroutine != null)
@@ -334,7 +315,6 @@ public class ObjectHighlighter : MonoBehaviour
         }
         isManagerTaskActive = false;
 
-
         TaskBarItem currentManagerTask = FindCurrentManagerTask();
         if (currentManagerTask != null)
         {
@@ -342,10 +322,8 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
-
     private TaskBarItem FindCurrentManagerTask()
     {
-
         if (taskBarMenu != null)
         {
             foreach (var item in taskBarMenu.GetItems())
@@ -356,7 +334,6 @@ public class ObjectHighlighter : MonoBehaviour
                 }
             }
         }
-
 
         TaskBarItem[] allItems = FindObjectsOfType<TaskBarItem>();
         foreach (var item in allItems)
@@ -380,23 +357,15 @@ public class ObjectHighlighter : MonoBehaviour
             yield return null;
         }
 
-
         if (isManagerTaskActive && timeLeft <= 0f)
         {
-
-
-
             if (gameManager != null)
             {
                 gameManager.OnManagerCallMissed();
             }
 
-
             taskBarMenu.RemoveTaskBar("Consult with Manager");
-
-
             StartCooldown();
-
             isManagerTaskActive = false;
         }
     }
@@ -406,18 +375,15 @@ public class ObjectHighlighter : MonoBehaviour
         isOnCooldown = true;
         cooldownTimer = interactionCooldown;
 
-
         if (isManagerTaskActive)
         {
             StopManagerTask();
         }
 
-
         if (promptUI != null)
         {
             promptUI.Hide();
         }
-
 
         switch (gameObject.name)
         {
@@ -436,15 +402,12 @@ public class ObjectHighlighter : MonoBehaviour
             default:
                 break;
         }
-
-
     }
 
     void EndCooldown()
     {
         isOnCooldown = false;
         cooldownTimer = 0f;
-
 
         if (isHighlighted && spriteRenderer != null)
         {
@@ -454,18 +417,14 @@ public class ObjectHighlighter : MonoBehaviour
             spriteRenderer.color = pulseColor;
         }
 
-
         if (IsTaskManager())
         {
-
             taskBarMenu.AddNewTaskBar("Consult with Manager");
-
-
             StartManagerTask();
+            AudioManager.Instance.TriggerPhoneCall();
         }
         else
         {
-
             switch (gameObject.name)
             {
                 case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
@@ -482,10 +441,8 @@ public class ObjectHighlighter : MonoBehaviour
             }
         }
 
-
         if (playerInRange && promptUI != null)
         {
-
             if (IsTaskManager())
             {
                 promptUI.UpdateText("Consult with Manager (Red Priority)");
@@ -496,8 +453,6 @@ public class ObjectHighlighter : MonoBehaviour
             }
             promptUI.Show();
         }
-
-
     }
 
     void UpdateCooldownText()
@@ -510,7 +465,6 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
-
     public void RefreshTaskManagerSettings()
     {
         if (IsTaskManager())
@@ -518,6 +472,7 @@ public class ObjectHighlighter : MonoBehaviour
             ConfigureTaskManager();
         }
     }
+
     public void EnableObject()
     {
         highlightEnabled = true;
@@ -527,13 +482,11 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
-
     public void DisableObject()
     {
         highlightEnabled = false;
         StopHighlight();
     }
-
 
     public void ToggleObject()
     {
@@ -547,7 +500,6 @@ public class ObjectHighlighter : MonoBehaviour
             StopHighlight();
         }
     }
-
 
     public void DisableTemporarily(float seconds)
     {
@@ -572,7 +524,6 @@ public class ObjectHighlighter : MonoBehaviour
         EndCooldown();
     }
 
-
     public void SetCooldown(float newCooldown)
     {
         interactionCooldown = newCooldown;
@@ -581,7 +532,6 @@ public class ObjectHighlighter : MonoBehaviour
             cooldownTimer = Mathf.Min(cooldownTimer, newCooldown);
         }
     }
-
 
     public void ForceCooldown(float customCooldown = -1f)
     {
@@ -592,13 +542,11 @@ public class ObjectHighlighter : MonoBehaviour
         StartCooldown();
     }
 
-
     public void RefreshUI()
     {
         CreatePromptUI();
         if (isHighlighted && playerInRange && !isOnCooldown)
         {
-
             if (IsTaskManager())
             {
                 promptUI.UpdateText("Consult with Manager (Red Priority)");
@@ -625,7 +573,6 @@ public class ObjectHighlighter : MonoBehaviour
         return playerInRange;
     }
 
-
     public bool IsEnabled
     {
         get { return highlightEnabled; }
@@ -646,7 +593,6 @@ public class ObjectHighlighter : MonoBehaviour
         get { return isOnCooldown ? cooldownTimer : 0f; }
     }
 
- 
     public string GetStatusInfo()
     {
         return $"Object: {gameObject.name}\n" +
@@ -657,7 +603,6 @@ public class ObjectHighlighter : MonoBehaviour
                $"Cooldown time left: {cooldownTimer:F1}s\n" +
                $"Cooldown progress: {CooldownProgress:P0}";
     }
-
 
     public void OnPuzzleCompleted()
     {
@@ -672,9 +617,7 @@ public class ObjectHighlighter : MonoBehaviour
         StartCooldown();
     }
 
-
     public void OnPuzzleClosed()
     {
-
     }
 }

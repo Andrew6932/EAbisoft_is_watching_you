@@ -15,13 +15,22 @@ public class AudioManager : MonoBehaviour
     public AudioClip puzzleFailSound;
     public AudioClip catMeowSound;
     public AudioClip buttonClickSound;
+    public AudioClip phoneRingSound;
+
+    [Header("Phone Settings")]
+    public float phoneCallCooldown = 30f;
+    public float phoneRingDuration = 5f;
 
     [Header("Audio Sources")]
     public AudioSource musicSource;
     public AudioSource sfxSource;
+    public AudioSource phoneSource;
 
     private static AudioManager instance;
     private float originalMusicVolume;
+    private bool isPhoneOnCooldown = false;
+    private Coroutine phoneCoroutine;
+    private bool isPhoneRinging = false;
 
     public static AudioManager Instance
     {
@@ -53,7 +62,6 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-
         if (musicSource == null)
         {
             musicSource = gameObject.AddComponent<AudioSource>();
@@ -67,6 +75,13 @@ public class AudioManager : MonoBehaviour
             sfxSource.volume = 0.7f;
         }
 
+        if (phoneSource == null)
+        {
+            phoneSource = gameObject.AddComponent<AudioSource>();
+            phoneSource.volume = 0.8f;
+            phoneSource.loop = true;
+        }
+
         originalMusicVolume = musicVolume;
     }
 
@@ -76,6 +91,62 @@ public class AudioManager : MonoBehaviour
         {
             PlayBackgroundMusic();
         }
+
+        StartPhoneCooldown();
+    }
+
+    public void TriggerPhoneCall()
+    {
+        if (!isPhoneOnCooldown && phoneRingSound != null && !isPhoneRinging)
+        {
+            isPhoneRinging = true;
+            phoneSource.clip = phoneRingSound;
+            phoneSource.loop = true;
+            phoneSource.Play();
+
+            if (phoneCoroutine != null)
+                StopCoroutine(phoneCoroutine);
+
+            phoneCoroutine = StartCoroutine(PhoneRingDurationRoutine());
+        }
+    }
+
+    public void StopPhoneRing()
+    {
+        if (isPhoneRinging)
+        {
+            isPhoneRinging = false;
+            if (phoneCoroutine != null)
+                StopCoroutine(phoneCoroutine);
+
+            phoneSource.Stop();
+            phoneSource.clip = null;
+            StartPhoneCooldown();
+        }
+    }
+
+    private IEnumerator PhoneRingDurationRoutine()
+    {
+        yield return new WaitForSeconds(phoneRingDuration);
+        isPhoneRinging = false;
+        phoneSource.Stop();
+        phoneSource.clip = null;
+        StartPhoneCooldown();
+    }
+
+    private void StartPhoneCooldown()
+    {
+        isPhoneOnCooldown = true;
+        if (phoneCoroutine != null)
+            StopCoroutine(phoneCoroutine);
+
+        phoneCoroutine = StartCoroutine(PhoneCooldownRoutine());
+    }
+
+    private IEnumerator PhoneCooldownRoutine()
+    {
+        yield return new WaitForSeconds(phoneCallCooldown);
+        isPhoneOnCooldown = false;
     }
 
     public void PlayBackgroundMusic()
@@ -150,6 +221,14 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    public void SetPhoneVolume(float volume)
+    {
+        if (phoneSource != null)
+        {
+            phoneSource.volume = Mathf.Clamp01(volume);
+        }
+    }
+
     public void FadeOutMusic(float duration)
     {
         StartCoroutine(FadeMusic(0f, duration));
@@ -173,5 +252,15 @@ public class AudioManager : MonoBehaviour
         }
 
         musicSource.volume = targetVolume;
+    }
+
+    public bool IsPhoneRinging()
+    {
+        return isPhoneRinging;
+    }
+
+    public float GetPhoneCooldownProgress()
+    {
+        return isPhoneOnCooldown ? 0f : 1f;
     }
 }
