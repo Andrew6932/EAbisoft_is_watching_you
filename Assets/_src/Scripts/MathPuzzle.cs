@@ -204,7 +204,7 @@ public class MathPuzzle : MonoBehaviour
 
         GameObject hintDisplay = CreateUIElement("Hint", puzzleContainer.transform);
         hintText = hintDisplay.AddComponent<TextMeshProUGUI>();
-        hintText.text = "Введите ответ и нажмите Enter (ESC - выход)";
+        hintText.text = "Input and click Enter (ESC - exit)";
 
         if (textFont != null)
             hintText.font = textFont;

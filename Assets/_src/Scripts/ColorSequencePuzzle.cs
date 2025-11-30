@@ -332,11 +332,10 @@ public class ColorSequencePuzzle : MonoBehaviour
         {
             float progress = 20 + Random.Range(-7, 7);
             progressBar.addProgress(progress);
-            messageText.text = "✓ ПОСЛЕДОВАТЕЛЬНОСТЬ ВЕРНА!";
+            messageText.text = " Correct!";
             messageText.color = Color.green;
         }
 
-        // Мигаем правильной последовательностью
         yield return StartCoroutine(ShowSuccessAnimation());
 
         yield return new WaitForSeconds(0.5f);
@@ -410,7 +409,6 @@ public class ColorSequencePuzzle : MonoBehaviour
 
     public void StartPuzzle()
     {
-        Debug.Log("Запуск пазла с последовательностью: " + gameObject.name);
 
         isPuzzleActive = true;
         playerSequence.Clear();

@@ -505,7 +505,7 @@ public class ObjectHighlighter : MonoBehaviour
         if (promptUI != null && isOnCooldown && playerInRange)
         {
             int secondsLeft = Mathf.CeilToInt(cooldownTimer);
-            promptUI.UpdateText($"cooldown: {secondsLeft}с");
+            promptUI.UpdateText($"cooldown: {secondsLeft}s");
             promptUI.Show();
         }
     }
