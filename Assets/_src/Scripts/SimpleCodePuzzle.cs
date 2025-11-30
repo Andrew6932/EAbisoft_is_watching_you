@@ -116,7 +116,7 @@ public class SimpleCodePuzzle : MonoBehaviour
  
         GameObject codeDisplay = CreateUIElement("CodeDisplay", puzzleContainer.transform);
         codeDisplayText = codeDisplay.AddComponent<Text>();
-        codeDisplayText.text = "КОД: " + targetCode;
+        codeDisplayText.text = "Code: " + targetCode;
 
         if (textFont != null)
             codeDisplayText.font = textFont;

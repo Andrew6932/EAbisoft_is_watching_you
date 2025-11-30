@@ -10,8 +10,8 @@ public class GameManager : MonoBehaviour
     float gameSuccessfulCount;
     public TimeBar timeBar;
     public GameCompletionBar gameCompletionBar;
-    //bool gameRelease;
-    int missedManagerCalls = 0; // Счетчик пропущенных звонков менеджера
+
+    int missedManagerCalls = 0; 
     bool endIteration = false;
 
     private void Start()
