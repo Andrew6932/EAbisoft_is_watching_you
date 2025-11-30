@@ -446,12 +446,14 @@ MonoBehaviour:
   minAlpha: 0.3
   maxAlpha: 1
   startHighlighted: 1
+  gameManager: {fileID: 0}
   interactionText: 'click E '
   textOffset: {x: 0, y: 2, z: 0}
   interactionCooldown: 10
   showCooldownText: 1
   showCooldownVisual: 1
   cooldownColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  managerTaskDuration: 10
   codePuzzle: {fileID: 0}
   waitPuzzle: {fileID: 0}
   mathPuzzle: {fileID: 125111906}
@@ -2176,12 +2178,14 @@ MonoBehaviour:
   minAlpha: 0.3
   maxAlpha: 1
   startHighlighted: 1
+  gameManager: {fileID: 1307369781}
   interactionText: 'click E '
   textOffset: {x: 0, y: 2, z: 0}
   interactionCooldown: 10
   showCooldownText: 1
   showCooldownVisual: 1
   cooldownColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  managerTaskDuration: 10
   codePuzzle: {fileID: 0}
   waitPuzzle: {fileID: 548892931}
   mathPuzzle: {fileID: 0}
@@ -21958,12 +21962,14 @@ MonoBehaviour:
   minAlpha: 0.3
   maxAlpha: 1
   startHighlighted: 1
+  gameManager: {fileID: 0}
   interactionText: 'click E '
   textOffset: {x: 0, y: 2, z: 0}
   interactionCooldown: 10
   showCooldownText: 1
   showCooldownVisual: 1
   cooldownColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  managerTaskDuration: 10
   codePuzzle: {fileID: 1294909592}
   waitPuzzle: {fileID: 0}
   mathPuzzle: {fileID: 0}
@@ -22780,12 +22786,14 @@ MonoBehaviour:
   minAlpha: 0.3
   maxAlpha: 1
   startHighlighted: 1
+  gameManager: {fileID: 0}
   interactionText: 'click E '
   textOffset: {x: 0, y: 2, z: 0}
   interactionCooldown: 10
   showCooldownText: 1
   showCooldownVisual: 1
   cooldownColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  managerTaskDuration: 10
   codePuzzle: {fileID: 0}
   waitPuzzle: {fileID: 0}
   mathPuzzle: {fileID: 0}

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal.Internal;
@@ -12,20 +12,44 @@ public class GameManager : MonoBehaviour
     public GameCompletionBar gameCompletionBar;
     bool gameRelease;
     private Coroutine gameLoopCoroutine;
-    
-    
+    int missedManagerCalls = 0; // Счетчик пропущенных звонков менеджера
+
     private void Start()
     {
         gameCount = 0;
         gameSuccessfulCount = 0f;
         gameRelease = false;
+        missedManagerCalls = 0;
         Debug.Log("GameManager Start");
-        gameLoopCoroutine = StartCoroutine(startGameIteration());
+        StartCoroutine(startGameIteration());
     }
-    
+
     public void addGameCount()
     {
         gameCount++;
+    }
+
+    public void OnManagerCallMissed()
+    {
+        missedManagerCalls++;
+        Debug.Log($"Пропущен звонок менеджера! Всего пропущено: {missedManagerCalls}");
+
+
+        if (missedManagerCalls >= 2)
+        {
+            Debug.Log("Пропущено 2 звонка менеджера! Время сбрасывается!");
+
+            lostGame();
+            missedManagerCalls = 0;
+        }
+        else
+        {
+
+            float currentProgress = gameCompletionBar.getProgress();
+            float newProgress = Mathf.Max(0f, currentProgress - 0.05f);
+            gameCompletionBar.setProgress(newProgress, 20f);
+            Debug.Log($"Прогресс уменьшен на 5%. Текущий прогресс: {newProgress:P0}");
+        }
     }
 
     public IEnumerator startGameIteration()
@@ -38,44 +62,36 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         while (true)
         {
+            checkTimers();
+            checkGameCompletion();
+            yield return new WaitForSeconds(1f);
 
-                if (!gameRelease){
-                    checkTimers();
+            if (gameRelease)
+            {
+                gameRelease = false;
+                break;
+            }
 
-                    checkGameCompletion();
-                    yield return new WaitForSeconds(0.5f);
-                }
-                else
-                {
-                    gameRelease = false;
-                    break;
-                }
-            
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
         }
-        
+
         Debug.Log("End of startGameManager");
-        
     }
 
     public void checkTimers()
     {
-
         if (timeBar.getIsEmpty())
         {
             incompleteLaunch();
         }
     }
 
-
     public void checkGameCompletion()
     {
-        if (gameCompletionBar.getProgress() >= 1f) 
+        if (gameCompletionBar.getProgress() >= 1f)
         {
             CompleteGameIteration();
         }
-
-
     }
 
     public void CompleteGameIteration()
@@ -91,19 +107,20 @@ public class GameManager : MonoBehaviour
 
 
 
+        StartCoroutine(startGameIteration());
 
         gameCount++;
         gameSuccessfulCount++;
+
+        missedManagerCalls = 0;
+
         Debug.Log($"Iteration completed. Total games: {gameCount}, Successful: {gameSuccessfulCount}");
     }
-
-
-
 
     public void incompleteLaunch()
     {
         gameRelease = true;
-        if(gameCompletionBar.getProgress() <= 0.5f)
+        if (gameCompletionBar.getProgress() <= 0.5f)
         {
             Debug.Log("Problem with compBar");
             lostGame();
@@ -120,22 +137,24 @@ public class GameManager : MonoBehaviour
             {
                 gameRelease = true;
                 Debug.Log("&&&&&&&&&&&!");
-                timeBar.SetProgress(1,1);
+                StopCoroutine(startGameIteration());
+
+                StartCoroutine(startGameIteration());
 
                 gameCount++;
 
                 StopCoroutine(gameLoopCoroutine);
                 gameLoopCoroutine = StartCoroutine(startGameIteration());
+                missedManagerCalls = 0;
             }
         }
-
     }
 
     public void lostGame()
     {
         Debug.Log("Game Lost!");
-        StopCoroutine(gameLoopCoroutine);
-        SceneManager.LoadScene("LoseScreen",LoadSceneMode.Single);
+        StopCoroutine(startGameIteration());
+        SceneManager.LoadScene("LoseScreen", LoadSceneMode.Single);
     }
 
     public bool isFired(float percent)
