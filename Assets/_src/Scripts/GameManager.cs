@@ -37,21 +37,27 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         while (true)
         {
-            checkTimers();
-            checkGameCompletion();
+
+                checkTimers();
+
+                checkGameCompletion();
+                yield return new WaitForSeconds(1f);
+                if (gameRelease)
+                {
+                    gameRelease = false;
+                    break;
+                }
+            
             yield return new WaitForSeconds(1f);
-            if (gameRelease)
-            {
-                gameRelease = false;
-                break;
-            }
         }
+        
         Debug.Log("End of startGameManager");
         
     }
 
     public void checkTimers()
     {
+
         if (timeBar.getIsEmpty())
         {
             incompleteLaunch();
@@ -65,6 +71,8 @@ public class GameManager : MonoBehaviour
         {
             CompleteGameIteration();
         }
+
+
     }
 
     public void CompleteGameIteration()
@@ -93,10 +101,12 @@ public class GameManager : MonoBehaviour
         gameRelease = true;
         if(gameCompletionBar.getProgress() <= 0.5f)
         {
+            Debug.Log("Problem with compBar");
             lostGame();
         }
         else
         {
+            Debug.Log("ElSE");
             float percent = 1f - gameCompletionBar.getProgress();
             if (isFired(percent))
             {
@@ -104,9 +114,18 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                gameRelease = true;
+                Debug.Log("&&&&&&&&&&&!");
+                StopCoroutine(startGameIteration());
+
+                StartCoroutine(startGameIteration());
+
                 gameCount++;
+                
+                
             }
         }
+
     }
 
     public void lostGame()
@@ -120,6 +139,8 @@ public class GameManager : MonoBehaviour
     {
         System.Random rnd = new System.Random();
         float num = (float)rnd.Next(1, 100) / 100f;
+        Debug.Log(num);
+        Debug.Log(percent);
         return num <= percent;
     }
 }
