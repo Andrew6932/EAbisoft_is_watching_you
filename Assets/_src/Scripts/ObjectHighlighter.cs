@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ObjectHighlighter : MonoBehaviour
 {
     [Header("Highlight Settings")]
-    public bool highlightEnabled = true; // Главный флаг - если включен, то и подсветка и взаимодействие работают
+    public bool highlightEnabled = true;
     public Color highlightColor = Color.yellow;
     public float pulseSpeed = 2f;
     public float minAlpha = 0.3f;
@@ -16,10 +17,13 @@ public class ObjectHighlighter : MonoBehaviour
     public Vector3 textOffset = new Vector3(0, 2f, 0);
 
     [Header("Cooldown Settings")]
-    public float interactionCooldown = 10f; // Кулдаун в секундах
+    public float interactionCooldown = 10f;
     public bool showCooldownText = true;
     public bool showCooldownVisual = true;
     public Color cooldownColor = Color.gray;
+
+    [Header("Task Manager Settings")]
+    public float managerTaskDuration = 10f; // Время на выполнение задачи менеджера
 
     [Header("Puzzle Settings")]
     public SimpleCodePuzzle codePuzzle;
@@ -34,6 +38,8 @@ public class ObjectHighlighter : MonoBehaviour
     private InteractionPromptUI promptUI;
     private bool isOnCooldown = false;
     private float cooldownTimer = 0f;
+    private Coroutine managerTaskCoroutine;
+    private bool isManagerTaskActive = false;
     public TaskBarMenu taskBarMenu;
 
     void Start()
@@ -46,7 +52,12 @@ public class ObjectHighlighter : MonoBehaviour
 
         CreatePromptUI();
 
-        // Автоматически применяем настройку highlightEnabled
+        // Особые настройки для таск менеджера
+        if (IsTaskManager())
+        {
+            ConfigureTaskManager();
+        }
+
         if (highlightEnabled && startHighlighted)
         {
             StartHighlight();
@@ -56,6 +67,7 @@ public class ObjectHighlighter : MonoBehaviour
             StopHighlight();
         }
 
+        // Добавляем задачи в таскбар для всех объектов КРОМЕ таск менеджера
         switch (gameObject.name)
         {
             case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
@@ -67,12 +79,31 @@ public class ObjectHighlighter : MonoBehaviour
             case "Modern_Office_MV_2_TILESETS_B-C-D-E_45":
                 taskBarMenu.AddNewTaskBar("Program Game");
                 break;
-            case "Modern_Office_MV_2_TILESETS_B-C-D-E_36":
-                taskBarMenu.AddNewTaskBar("Consult with Manager");
-                break;
+            // Таск менеджер НЕ добавляется изначально - он появится после кулдауна
             default:
                 break;
         }
+    }
+
+    // Проверяем, является ли этот объект таск менеджером
+    private bool IsTaskManager()
+    {
+        return gameObject.name == "Modern_Office_MV_2_TILESETS_B-C-D-E_36";
+    }
+
+    // Настраиваем таск менеджер с особыми параметрами
+    private void ConfigureTaskManager()
+    {
+        // Устанавливаем красный цвет подсветки
+        highlightColor = Color.red;
+
+        // Устанавливаем случайный кулдаун от 15 до 40 секунд
+        interactionCooldown = Random.Range(15f, 40f);
+
+        // Включаем кулдаун сразу при старте
+        StartCooldown();
+
+        Debug.Log($"Таск менеджер настроен: кулдаун {interactionCooldown:F1} секунд, цвет: красный");
     }
 
     void Update()
@@ -132,7 +163,17 @@ public class ObjectHighlighter : MonoBehaviour
         promptObj.transform.localPosition = textOffset;
 
         promptUI = promptObj.AddComponent<InteractionPromptUI>();
-        promptUI.Setup(interactionText);
+
+        // Для таск менеджера обновляем текст с учетом красной подсветки
+        if (IsTaskManager())
+        {
+            promptUI.Setup("Consult with Manager (Red Priority)");
+        }
+        else
+        {
+            promptUI.Setup(interactionText);
+        }
+
         promptUI.Hide();
     }
 
@@ -160,7 +201,15 @@ public class ObjectHighlighter : MonoBehaviour
             }
             else
             {
-                promptUI.UpdateText(interactionText);
+                // Для таск менеджера используем специальный текст
+                if (IsTaskManager())
+                {
+                    promptUI.UpdateText("Consult with Manager (Red Priority)");
+                }
+                else
+                {
+                    promptUI.UpdateText(interactionText);
+                }
             }
             promptUI.Show();
         }
@@ -192,6 +241,14 @@ public class ObjectHighlighter : MonoBehaviour
                 {
                     UpdateCooldownText();
                 }
+                else
+                {
+                    // Для таск менеджера используем специальный текст
+                    if (IsTaskManager())
+                    {
+                        promptUI.UpdateText("Consult with Manager (Red Priority)");
+                    }
+                }
                 promptUI.Show();
             }
         }
@@ -215,6 +272,15 @@ public class ObjectHighlighter : MonoBehaviour
 
         Debug.Log("Взаимодействие с: " + gameObject.name);
 
+        // Если это менеджер и активна задача с обратным отсчетом, останавливаем ее
+        if (IsTaskManager() && isManagerTaskActive)
+        {
+            StopManagerTask();
+
+            // Убираем задачу из таскбара при начале взаимодействия
+            taskBarMenu.RemoveTaskBar("Consult with Manager");
+        }
+
         // Запускаем соответствующий пазл
         if (codePuzzle != null)
         {
@@ -228,7 +294,6 @@ public class ObjectHighlighter : MonoBehaviour
         }
         else if (mathPuzzle != null)
         {
-            // Генерируем новый пример ПЕРЕД запуском
             mathPuzzle.GenerateMathProblem();
             mathPuzzle.StartPuzzle();
             StartCooldown();
@@ -240,16 +305,107 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
+    // ЗАПУСК задачи менеджера с обратным отсчетом
+    private void StartManagerTask()
+    {
+        if (managerTaskCoroutine != null)
+        {
+            StopCoroutine(managerTaskCoroutine);
+        }
+        isManagerTaskActive = true;
+        managerTaskCoroutine = StartCoroutine(ManagerTaskCountdown());
+    }
+
+    // Остановка задачи менеджера (при успешном взаимодействии)
+    private void StopManagerTask()
+    {
+        if (managerTaskCoroutine != null)
+        {
+            StopCoroutine(managerTaskCoroutine);
+            managerTaskCoroutine = null;
+        }
+        isManagerTaskActive = false;
+
+        // Останавливаем обратный отсчет в таскбаре
+        TaskBarItem currentManagerTask = FindCurrentManagerTask();
+        if (currentManagerTask != null)
+        {
+            currentManagerTask.StopCountdown();
+        }
+    }
+
+    // Находим текущую задачу менеджера в таскбаре
+    private TaskBarItem FindCurrentManagerTask()
+    {
+        // Вариант 1: если TaskBarMenu хранит список items
+        if (taskBarMenu != null)
+        {
+            foreach (var item in taskBarMenu.GetItems())
+            {
+                if (item.GetLabel().StartsWith("Consult with Manager"))
+                {
+                    return item;
+                }
+            }
+        }
+
+        // Вариант 2: найти через поиск по сцене
+        TaskBarItem[] allItems = FindObjectsOfType<TaskBarItem>();
+        foreach (var item in allItems)
+        {
+            if (item.GetLabel().StartsWith("Consult with Manager"))
+            {
+                return item;
+            }
+        }
+
+        return null;
+    }
+
+    // Обратный отсчет для задачи менеджера
+    private IEnumerator ManagerTaskCountdown()
+    {
+        float timeLeft = managerTaskDuration;
+
+        while (timeLeft > 0f && isManagerTaskActive)
+        {
+            timeLeft -= Time.deltaTime;
+            yield return null;
+        }
+
+        // Если время вышло и задача все еще активна (не было взаимодействия)
+        if (isManagerTaskActive && timeLeft <= 0f)
+        {
+            Debug.Log("Время на консультацию с менеджером вышло! Объект уходит на кулдаун.");
+
+            // Убираем задачу из таскбара
+            taskBarMenu.RemoveTaskBar("Consult with Manager");
+
+            // Запускаем кулдаун
+            StartCooldown();
+
+            isManagerTaskActive = false;
+        }
+    }
+
     void StartCooldown()
     {
         isOnCooldown = true;
         cooldownTimer = interactionCooldown;
+
+        // Останавливаем задачу менеджера если она активна
+        if (isManagerTaskActive)
+        {
+            StopManagerTask();
+        }
 
         // Скрываем подсказку взаимодействия
         if (promptUI != null)
         {
             promptUI.Hide();
         }
+
+        // Убираем задачу из таскбара при начале кулдауна
         switch (gameObject.name)
         {
             case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
@@ -285,30 +441,47 @@ public class ObjectHighlighter : MonoBehaviour
             spriteRenderer.color = pulseColor;
         }
 
+        // Для таск менеджера запускаем задачу с обратным отсчетом
+        if (IsTaskManager())
+        {
+            // Добавляем задачу в таскбар
+            taskBarMenu.AddNewTaskBar("Consult with Manager");
+
+            // Запускаем обратный отсчет для задачи
+            StartManagerTask(); // ВОТ ТЕПЕРЬ ЭТОТ МЕТОД СУЩЕСТВУЕТ
+        }
+        else
+        {
+            // Для других объектов просто добавляем задачу
+            switch (gameObject.name)
+            {
+                case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
+                    taskBarMenu.AddNewTaskBar("Program Combat AI");
+                    break;
+                case "Modern_Office_MV_2_TILESETS_B-C-D-E_38":
+                    taskBarMenu.AddNewTaskBar("Edit Graphics");
+                    break;
+                case "Modern_Office_MV_2_TILESETS_B-C-D-E_45":
+                    taskBarMenu.AddNewTaskBar("Program Game");
+                    break;
+                default:
+                    break;
+            }
+        }
+
         // Показываем подсказку снова если игрок в зоне
         if (playerInRange && promptUI != null)
         {
-            promptUI.UpdateText(interactionText);
+            // Для таск менеджера используем специальный текст
+            if (IsTaskManager())
+            {
+                promptUI.UpdateText("Consult with Manager (Red Priority)");
+            }
+            else
+            {
+                promptUI.UpdateText(interactionText);
+            }
             promptUI.Show();
-        }
-
-        Debug.Log(gameObject.name);
-        switch (gameObject.name)
-        {
-            case "Modern_Office_MV_2_TILESETS_B-C-D-E_48":
-                taskBarMenu.AddNewTaskBar("Program Combat AI");
-                break;
-            case "Modern_Office_MV_2_TILESETS_B-C-D-E_38":
-                taskBarMenu.AddNewTaskBar("Edit Graphics");
-                break;
-            case "Modern_Office_MV_2_TILESETS_B-C-D-E_45":
-                taskBarMenu.AddNewTaskBar("Program Game");
-                break;
-            case "Modern_Office_MV_2_TILESETS_B-C-D-E_36":
-                taskBarMenu.AddNewTaskBar("Consult with Manager");
-                break;
-            default:
-                break;
         }
 
         Debug.Log("Кулдаун завершен для: " + gameObject.name);
@@ -324,6 +497,14 @@ public class ObjectHighlighter : MonoBehaviour
         }
     }
 
+    // Метод для принудительного обновления настроек таск менеджера
+    public void RefreshTaskManagerSettings()
+    {
+        if (IsTaskManager())
+        {
+            ConfigureTaskManager();
+        }
+    }
     // Методы для управления из инспектора и других скриптов
 
     /// <summary>
@@ -424,7 +605,15 @@ public class ObjectHighlighter : MonoBehaviour
         CreatePromptUI();
         if (isHighlighted && playerInRange && !isOnCooldown)
         {
-            promptUI.UpdateText(interactionText);
+            // Для таск менеджера используем специальный текст
+            if (IsTaskManager())
+            {
+                promptUI.UpdateText("Consult with Manager (Red Priority)");
+            }
+            else
+            {
+                promptUI.UpdateText(interactionText);
+            }
             promptUI.Show();
         }
     }
