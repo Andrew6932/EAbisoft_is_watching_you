@@ -55,6 +55,7 @@ public class WaitTimePuzzle : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInZone = true;
+            Debug.Log("Игрок вошел в зону ожидания");
             if (isPuzzleActive)
             {
                 StartWait();
@@ -67,6 +68,7 @@ public class WaitTimePuzzle : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInZone = false;
+            Debug.Log("Игрок вышел из зоны ожидания");
             if (isPuzzleActive)
             {
                 StopWait();
@@ -216,7 +218,7 @@ public class WaitTimePuzzle : MonoBehaviour
         {
             float progress = currentWaitTime / waitTimeRequired;
             progressBar.fillAmount = progress;
-            progressText.text = $"Ожидание: {progress * 100:F0}%"; // Исправлено с 78 на 100
+            progressText.text = $"Ожидание: {progress * 100:F0}%";
         }
         else if (progressText != null)
         {
@@ -232,6 +234,7 @@ public class WaitTimePuzzle : MonoBehaviour
 
     void StartWait()
     {
+        Debug.Log("Начало ожидания, игрок в зоне");
         if (progressText != null)
         {
             progressText.color = progressColor;
@@ -247,6 +250,7 @@ public class WaitTimePuzzle : MonoBehaviour
 
     void StopWait()
     {
+        Debug.Log("Остановка ожидания, игрок вышел из зоны");
         if (progressText != null)
         {
             progressText.color = Color.red;
@@ -256,6 +260,7 @@ public class WaitTimePuzzle : MonoBehaviour
 
     void CompletePuzzle()
     {
+        Debug.Log("Пазл завершен!");
         StartCoroutine(PuzzleComplete());
     }
 
@@ -295,7 +300,9 @@ public class WaitTimePuzzle : MonoBehaviour
 
         isPuzzleActive = true;
         currentWaitTime = 0f;
-        playerInZone = false;
+
+        // Проверяем, находится ли игрок уже в зоне при старте пазла
+        CheckPlayerInZone();
 
         // Всегда создаем новый UI
         CreatePuzzleUI();
@@ -308,8 +315,25 @@ public class WaitTimePuzzle : MonoBehaviour
         }
     }
 
+    // Новый метод для проверки нахождения игрока в зоне при старте
+    void CheckPlayerInZone()
+    {
+        if (player == null) return;
+
+        // Проверяем пересечение коллайдеров
+        Collider2D playerCollider = player.GetComponent<Collider2D>();
+        Collider2D thisCollider = GetComponent<Collider2D>();
+
+        if (playerCollider != null && thisCollider != null)
+        {
+            playerInZone = playerCollider.IsTouching(thisCollider);
+            Debug.Log("Игрок в зоне при старте: " + playerInZone);
+        }
+    }
+
     public void ClosePuzzle()
     {
+        Debug.Log("Закрытие пазла ожидания");
         isPuzzleActive = false;
         playerInZone = false;
         currentWaitTime = 0f;
