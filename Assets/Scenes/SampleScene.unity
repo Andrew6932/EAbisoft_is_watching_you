@@ -19761,8 +19761,12 @@ MonoBehaviour:
   puzzleFailSound: {fileID: 8300000, guid: 0e1b9570c7ff380419192ad165c0c875, type: 3}
   catMeowSound: {fileID: 0}
   buttonClickSound: {fileID: 8300000, guid: 8aa73692cfa33ab4a932a701ed5ca074, type: 3}
+  phoneRingSound: {fileID: 8300000, guid: 23425c78ca5259f41b0e2ebddfa4c493, type: 3}
+  phoneCallCooldown: 30
+  phoneRingDuration: 5
   musicSource: {fileID: 0}
   sfxSource: {fileID: 0}
+  phoneSource: {fileID: 0}
 --- !u!4 &1074606272
 Transform:
   m_ObjectHideFlags: 0
